@@ -134,9 +134,12 @@
         .sidebar.sidebar.active ul li .tooltip{
             display: none;
         }
+
+
     </style>
 </head>
 <body>
+<?php require 'popups.php'; ?>
     <div class="sidebar">
         <div class="top">
             <div class="logo">
@@ -154,14 +157,14 @@
                 <span class="tooltip">Books</span>
             </li>
             <li>
-                <a href="#">
+                <a href="#" onclick="openPopup(event)">
                     <i class='bx bx-list-ul' ></i>
                     <span class="nav-item">Lists</span>
                 </a>
                 <span class="tooltip">Lists</span>
             </li>
             <li>
-                <a href="#">
+                <a href="#" onclick="openAbout(event)">
                     <i class='bx bx-info-circle' ></i>
                     <span class="nav-item">About</span>
                 </a>
