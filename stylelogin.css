@@ -30,7 +30,7 @@ body{
         filter: hue-rotate(360deg);
     }
 }
-.from-wrapper{
+.form-wrapper{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,15 +38,15 @@ body{
     height: 100%;
     transition: 1s ease-in-out;
 }
-.wrapper.active .from-wrapper.sign-in{
+.wrapper.active .form-wrapper.sign-in{
     transform: translateY(-450px);
 }
-.wrapper .from-wrapper.sign-up{
+.wrapper .form-wrapper.sign-up{
     position: absolute;
     top: 450px;
     left: 0;
 }
-.wrapper.active .from-wrapper.sign-up{
+.wrapper.active .form-wrapper.sign-up{
     transform: translateY(-450px);
 }
 h2{
@@ -108,7 +108,7 @@ button{
     outline: none;
 }
 .signUp-link p {
-    color: #fff;
+    color: #f0f0f0;
   }
   .signUp-link p a {
     color: #0ef;

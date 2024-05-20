@@ -178,7 +178,7 @@
                 <span class="tooltip">Settings</span>
             </li>
             <li>
-                <a href="#">
+                <a href="Login.php">
                     <i class='bx bxs-user-plus' ></i>
                     <span class="nav-item">Login</span>
                 </a>
