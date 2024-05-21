@@ -161,24 +161,24 @@
             </div>
         </div>
         <div class="product-catalog">
-            <div class="product-item" data-title="Product 1" data-description="This is the first product." data-price="$10" data-url="checkout1.html">
+            <div class="product-item" data-id="1" data-title="Product 1" data-description="This is the first product." data-price="$10" data-url="checkout1.html">
                 <img src="product1.jpg" alt="Product 1">
                 <h3>Product 1</h3>
                 <p>deskripsi singkat.</p>
             </div>
-            <div class="product-item" data-title="Product 2" data-description="This is the second product." data-price="$15" data-url="checkout2.html">
+            <div class="product-item" data-id="2" data-title="Product 2" data-description="This is the second product." data-price="$15" data-url="checkout2.html">
                 <img src="product2.jpg" alt="Product 2">
                 <h3>Product 2</h3>
                 <p>deskripsi singkat.</p>
             </div>
-            <div class="product-item" data-title="Product 1" data-description="This is the first product." data-price="$10" data-url="checkout1.html">
-                <img src="product1.jpg" alt="Product 3">
-                <h3>Product 1</h3>
+            <div class="product-item" data-id="3" data-title="Product 3" data-description="This is the third product." data-price="$20" data-url="checkout3.html">
+                <img src="product3.jpg" alt="Product 3">
+                <h3>Product 3</h3>
                 <p>deskripsi singkat.</p>
             </div>
-            <div class="product-item" data-title="Product 1" data-description="This is the first product." data-price="$10" data-url="checkout1.html">
-                <img src="product1.jpg" alt="Product 4">
-                <h3>Product 1</h3>
+            <div class="product-item" data-id="4" data-title="Product 4" data-description="This is the fourth product." data-price="$25" data-url="checkout4.html">
+                <img src="product4.jpg" alt="Product 4">
+                <h3>Product 4</h3>
                 <p>deskripsi singkat.</p>
             </div>
             <!-- Add more product items as needed -->
@@ -211,6 +211,11 @@
 
             item.addEventListener('mouseout', function () {
                 document.getElementById('product-preview').style.display = 'none';
+            });
+
+            item.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                window.location.href = `informasi.php?id=${id}`;
             });
         });
     </script>
