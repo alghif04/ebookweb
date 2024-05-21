@@ -60,6 +60,7 @@
             <img src="buku.jpg"alt="Cover Buku">
             <div class="book-details">
                 <h2>Judul Buku </h2>
+                <p>Detail atau isi dari ringkasan buku tersebut dengan ini anda bisa mengisikan isi dari ringkasan atau detail dari buku tersebut</p>
                 <p>Penulis :Nama Penulis</p>
                 <p>harga :Rp.......</p>
             </div>
