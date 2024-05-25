@@ -135,7 +135,12 @@
             display: none;
         }
 
-
+        .username {
+            font-size: 0.8em; 
+            display: block; 
+            margin-top: -30px; 
+            color: #a49a9a;
+        }
     </style>
 </head>
 <body>
@@ -157,11 +162,11 @@
                 <span class="tooltip">Books</span>
             </li>
             <li>
-                <a href="#" onclick="openPopup(event)">
+                <a href="<?php echo isset($_SESSION['username']) ? 'wishlist.php' /* Redirect ke page ini ketika sudah login */ : '#'; ?>" <?php echo !isset($_SESSION['username']) ? 'onclick="openPopup(event)"' : ''; ?>>
                     <i class='bx bx-list-ul' ></i>
-                    <span class="nav-item">Lists</span>
+                    <span class="nav-item">Wishlist</span>
                 </a>
-                <span class="tooltip">Lists</span>
+                <span class="tooltip">Wishlist</span>
             </li>
             <li>
                 <a href="#" onclick="openAbout(event)">
@@ -178,11 +183,22 @@
                 <span class="tooltip">Settings</span>
             </li>
             <li>
-                <a href="Login.php">
-                    <i class='bx bxs-user-plus' ></i>
-                    <span class="nav-item">Login</span>
-                </a>
-                <span class="tooltip">Login</span>
+                <?php if (isset($_SESSION['username'])): ?>
+                    <a href="logout.php">
+                        <i class='bx bx-log-out' ></i>
+                        <span class="nav-item">
+                            Logout
+                            <span class="username"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+                        </span>
+                    </a>
+                    <span class="tooltip">Logout</span>
+                <?php else: ?>
+                    <a href="Login.php">
+                        <i class='bx bx-log-in' ></i>
+                        <span class="nav-item">Login</span>
+                    </a>
+                    <span class="tooltip">Login</span>
+                <?php endif; ?>
             </li>
         </ul>
     </div>
