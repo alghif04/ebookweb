@@ -69,7 +69,7 @@
         .SortLabel a:hover::after,
         .SortLabel a:focus::after {
             opacity: 1;
-        }
+        } 
 
         .SortLabel {
             font-size: 1.2rem;
@@ -151,34 +151,34 @@
         <div class="sort-box">
             <span class="SortLabel">Sort by:</span>
             <div class="SortContainer">
-                <span class="SortLabel"><a href="#">Title</a></span>
+                <span class="SortLabel"><a href="#" id="sort-title">Title</a></span>
             </div>
             <div class="SortContainer">
-                <span class="SortLabel"><a href="#">Date Published</a></span>
+                <span class="SortLabel"><a href="#" id="sort-date-published">Date Published</a></span>
             </div>
             <div class="SortContainer">
-                <span class="SortLabel"><a href="#">Date Added</a></span>
+                <span class="SortLabel"><a href="#" id="sort-date-added">Date Added</a></span>
             </div>
         </div>
         <div class="product-catalog">
-            <div class="product-item" data-id="1" data-title="Product 1" data-description="This is the first product." data-price="$10" data-url="checkout1.html">
-                <img src="product1.jpg" alt="Product 1">
-                <h3>Product 1</h3>
+            <div class="product-item" data-id="1" data-title="Jackporter" data-description="This is the first product." data-price="$10" data-url="checkout1.html" data-date-published="2023-01-01" data-date-added="2023-01-05">
+                <img src="product1.jpg" alt="Jackporter">
+                <h3>Jackporter</h3>
                 <p>deskripsi singkat.</p>
             </div>
-            <div class="product-item" data-id="2" data-title="Product 2" data-description="This is the second product." data-price="$15" data-url="checkout2.html">
-                <img src="product2.jpg" alt="Product 2">
-                <h3>Product 2</h3>
+            <div class="product-item" data-id="2" data-title="Dandelions" data-description="This is the second product." data-price="$15" data-url="checkout2.html" data-date-published="2023-02-01" data-date-added="2023-02-05">
+                <img src="product2.jpg" alt="Dandelions">
+                <h3>Dandelions</h3>
                 <p>deskripsi singkat.</p>
             </div>
-            <div class="product-item" data-id="3" data-title="Product 3" data-description="This is the third product." data-price="$20" data-url="checkout3.html">
-                <img src="product3.jpg" alt="Product 3">
-                <h3>Product 3</h3>
+            <div class="product-item" data-id="3" data-title="Unhealthy" data-description="This is the third product." data-price="$20" data-url="checkout3.html" data-date-published="2023-03-01" data-date-added="2023-03-05">
+                <img src="product3.jpg" alt="Unhealthy">
+                <h3>Unhealthy</h3>
                 <p>deskripsi singkat.</p>
             </div>
-            <div class="product-item" data-id="4" data-title="Product 4" data-description="This is the fourth product." data-price="$25" data-url="checkout4.html">
-                <img src="product4.jpg" alt="Product 4">
-                <h3>Product 4</h3>
+            <div class="product-item" data-id="4" data-title="Titanic Ship" data-description="This is the fourth product." data-price="$25" data-url="checkout4.html" data-date-published="2023-04-01" data-date-added="2023-04-05">
+                <img src="product4.jpg" alt="Titanic Ship">
+                <h3>Titanic Ship</h3>
                 <p>deskripsi singkat.</p>
             </div>
             <!-- Add more product items as needed -->
@@ -217,6 +217,40 @@
                 const id = this.getAttribute('data-id');
                 window.location.href = `informasi.php?id=${id}`;
             });
+        });
+
+        function sortProducts(criteria) {
+            const catalog = document.querySelector('.product-catalog');
+            const products = Array.from(catalog.children);
+
+            products.sort((a, b) => {
+                const aValue = a.getAttribute(`data-${criteria}`).toLowerCase();
+                const bValue = b.getAttribute(`data-${criteria}`).toLowerCase();
+
+                if (criteria === 'title') {
+                    return aValue.localeCompare(bValue);
+                } else {
+                    return new Date(aValue) - new Date(bValue);
+                }
+            });
+
+            catalog.innerHTML = '';
+            products.forEach(product => catalog.appendChild(product));
+        }
+
+        document.getElementById('sort-title').addEventListener('click', (e) => {
+            e.preventDefault();
+            sortProducts('title');
+        });
+
+        document.getElementById('sort-date-published').addEventListener('click', (e) => {
+            e.preventDefault();
+            sortProducts('date-published');
+        });
+
+        document.getElementById('sort-date-added').addEventListener('click', (e) => {
+            e.preventDefault();
+            sortProducts('date-added');
         });
     </script>
 </body>
