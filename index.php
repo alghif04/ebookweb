@@ -141,7 +141,6 @@
         .product-preview a:hover {
             text-decoration: underline;
         }
-
         .wishlist-button {
             display: inline-block;
             padding: 8px 12px;
@@ -159,12 +158,16 @@
             background-color: #007bff;
             color: #fff;
         }
+
     </style>
 </head>
 <body>
     <?php include 'header.php'; ?>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
+    <div class="search">
+        <input type="text" id="searchInput" placeholder="Search by title or author">
+    </div>
         <div class="sort-box">
             <span class="SortLabel">Sort by:</span>
             <div class="SortContainer">
@@ -183,7 +186,7 @@
                 <h3>Jackporter</h3>
                 <p>deskripsi singkat.</p>
                 <p>Published: 2019</p>
-                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+             <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
             </div>
             <div class="product-item" data-id="2" data-title="Dandelions" data-description="This is the second product." data-price="$15" data-url="checkout2.html" data-date-published="2021-02-01" data-date-added="2024-02-05">
                 <img src="product2.jpg" alt="Dandelions">
@@ -293,6 +296,33 @@
 
             alert(`${title} has been added to your wishlist!`);
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const productCatalog = document.querySelector('.product-catalog');
+
+            // Function to filter product items based on search input
+            function filterProducts(searchTerm) {
+                const products = Array.from(productCatalog.children);
+
+                products.forEach(product => {
+                    const title = product.getAttribute('data-title').toLowerCase();
+                    const description = product.getAttribute('data-description').toLowerCase();
+
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        product.style.display = 'block';
+                    } else {
+                        product.style.display = 'none';
+                    }
+                });
+            }
+
+            // Event listener for search input
+            searchInput.addEventListener('input', function () {
+                const searchTerm = this.value.trim().toLowerCase();
+                filterProducts(searchTerm);
+            });
+        });
     </script>
 </body>
 </html>
