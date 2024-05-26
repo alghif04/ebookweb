@@ -137,7 +137,7 @@
             <li>Farhat Ibad Al Ghifari (22081010290)</li>
             <li>Neo Ramadhani (22081010291)</li>
             <li>Zenryo Yudi Arnava Darva Mahendra (22081010292)</li>
-            <li>Belia Putri Salsabila (22081010293)</li>
+            <li>Belia Putri Salsabila (22081010311)</li>
         </ul>
         <button type="button" onclick= "closeAbout()">OK</button>
     </div>
