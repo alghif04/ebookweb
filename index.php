@@ -161,25 +161,29 @@
             </div>
         </div>
         <div class="product-catalog">
-            <div class="product-item" data-id="1" data-title="Jackporter" data-description="This is the first product." data-price="$10" data-url="checkout1.html" data-date-published="2023-01-01" data-date-added="2023-01-05">
+            <div class="product-item" data-id="1" data-title="Jackporter" data-description="This is the first product." data-price="$10" data-url="checkout1.html" data-date-published="2019-01-01" data-date-added="2024-01-05">
                 <img src="product1.jpg" alt="Jackporter">
                 <h3>Jackporter</h3>
                 <p>deskripsi singkat.</p>
+                <p>Published: 2019</p>
             </div>
-            <div class="product-item" data-id="2" data-title="Dandelions" data-description="This is the second product." data-price="$15" data-url="checkout2.html" data-date-published="2023-02-01" data-date-added="2023-02-05">
+            <div class="product-item" data-id="2" data-title="Dandelions" data-description="This is the second product." data-price="$15" data-url="checkout2.html" data-date-published="2021-02-01" data-date-added="2024-02-05">
                 <img src="product2.jpg" alt="Dandelions">
                 <h3>Dandelions</h3>
                 <p>deskripsi singkat.</p>
+                <p>Published: 2021</p>
             </div>
-            <div class="product-item" data-id="3" data-title="Unhealthy" data-description="This is the third product." data-price="$20" data-url="checkout3.html" data-date-published="2023-03-01" data-date-added="2023-03-05">
+            <div class="product-item" data-id="3" data-title="Unhealthy" data-description="This is the third product." data-price="$20" data-url="checkout3.html" data-date-published="2023-03-01" data-date-added="2024-03-05">
                 <img src="product3.jpg" alt="Unhealthy">
                 <h3>Unhealthy</h3>
                 <p>deskripsi singkat.</p>
+                <p>Published: 2023</p>
             </div>
-            <div class="product-item" data-id="4" data-title="Titanic Ship" data-description="This is the fourth product." data-price="$25" data-url="checkout4.html" data-date-published="2023-04-01" data-date-added="2023-04-05">
+            <div class="product-item" data-id="4" data-title="Titanic Ship" data-description="This is the fourth product." data-price="$25" data-url="checkout4.html" data-date-published="2019-04-01" data-date-added="2024-04-05">
                 <img src="product4.jpg" alt="Titanic Ship">
                 <h3>Titanic Ship</h3>
                 <p>deskripsi singkat.</p>
+                <p>Published: 2019</p>
             </div>
             <!-- Add more product items as needed -->
         </div>
