@@ -24,8 +24,9 @@
                     <div class="remember">
                         <label><input type="checkbox">Remember me</label>
                     </div>
+                    <input type="hidden" name="form_type" value="login">
                     <button type="submit">Login</button>
-                    <div class="signup-link">
+                    <div class="signUp-link">
                         <p>Don't have an account? <a href="#" class="signUpBtn-link">Sign Up</a></p>
                     </div>
                 </form>
@@ -61,6 +62,7 @@
 </html>
 
 <?php 
+session_start();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['form_type'])) {
         if ($_POST['form_type'] == "signup") {
@@ -70,11 +72,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $email = filter_input(INPUT_POST, "signup-email", FILTER_SANITIZE_EMAIL);
 
             if (empty($username)) {
-                echo "Please enter a username";
+                echo '<script> alert ("Please enter a username")</script>';
             } elseif (empty($password)) {
-                echo "Please enter a password";
+                echo '<script> alert ("Please enter a password")</script>';
             } elseif (empty($email)) {
-                echo "Please enter an email";
+                echo '<script> alert ("Please enter an email")</script>';
             } else {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
                 $sql = "INSERT INTO user_details (username, email, password) VALUES ('$username', '$email', '$hash')";
@@ -88,11 +90,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Form login
             $username = filter_input(INPUT_POST, "login-username", FILTER_SANITIZE_SPECIAL_CHARS);
             $password = filter_input(INPUT_POST, "login-password", FILTER_SANITIZE_SPECIAL_CHARS);
+
+            if (empty($username)) {
+                echo '<script> alert ("Please enter a username")</script>'; 
+            }elseif (empty($username)){
+                echo '<script> alert ("Please enter a password")</script>';
+            }else{
+                $sql = "SELECT * FROM user_details WHERE username = '$username'";
+                $result = mysqli_query($conn, $sql);
+
+                if (mysqli_num_rows($result) == 1){
+                    $user = mysqli_fetch_assoc($result);
+                    if (password_verify($password, $user ['password'])){
+                        echo '<script> alert ("Login successful!")</script>';
+                        session_start();
+                        $_SESSION ['username'] = $username;
+                        
+                        header("Location: indexLogin.php"); // Redirect
+                        exit;
+                    }else{
+                        echo '<script> alert ("Incorrect password")</script>';
+                    }
+                } else {
+                    echo '<script> alert ("Username not found")</script>';
+                }
+            }
         
         }
     }
 }
 
+
 mysqli_close($conn);
 ?>
-
