@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,14 +26,33 @@
             width: calc(100% - 80px);
             padding: 1rem;
         }
+        
+        .search {
+        position: relative;
+        display: flex; 
+        float: right;
+        justify-content: space-between;
+        align-items: center;
+        margin-right: 15px;
+        width: 35%;
+        }
+
+        #searchInput {
+        flex: 1;
+        padding: 8px 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+         }
 
         .sort-box {
             display: flex;
             justify-content: flex-start;
-            padding: 10px;
-            border-bottom: 1px solid #333;
+            padding: 17px;
+            border-bottom: 0.5px solid #333;
             border-radius: 5px;
             margin-bottom: 20px;
+            margin-top: 25px;
         }
 
         .SortContainer {
@@ -82,7 +105,6 @@
             font-size: 1.2rem;
         }
 
-        /* Styles for product catalog */
         .product-catalog {
             display: flex;
             flex-wrap: wrap;
@@ -168,8 +190,8 @@
     <div class="search">
         <input type="text" id="searchInput" placeholder="Search by title or author">
     </div>
-        <div class="sort-box">
-            <span class="SortLabel">Sort by:</span>
+    <div class="sort-box">
+    <span class="SortLabel">Sort by:</span>
             <div class="SortContainer">
                 <span class="SortLabel"><a href="#" id="sort-title">Title</a></span>
             </div>
@@ -207,6 +229,13 @@
                 <h3>Titanic Ship</h3>
                 <p>deskripsi singkat.</p>
                 <p>Published: 2019</p>
+                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="4" data-title="Jungle Book" data-description="This is the fiveth product." data-price="$12" data-url="checkout5.html" data-date-published="2023-04-01" data-date-added="2024-05-05">
+                <img src="product5.jpg" alt="Jungle Book">
+                <h3>Jungle Book</h3>
+                <p>deskripsi singkat.</p>
+                <p>Published: 2023</p>
                 <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
             </div>
             <!-- Add more product items as needed -->
@@ -301,7 +330,6 @@
             const searchInput = document.getElementById('searchInput');
             const productCatalog = document.querySelector('.product-catalog');
 
-            // Function to filter product items based on search input
             function filterProducts(searchTerm) {
                 const products = Array.from(productCatalog.children);
 
@@ -317,7 +345,6 @@
                 });
             }
 
-            // Event listener for search input
             searchInput.addEventListener('input', function () {
                 const searchTerm = this.value.trim().toLowerCase();
                 filterProducts(searchTerm);
