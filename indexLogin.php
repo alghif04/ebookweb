@@ -33,8 +33,8 @@ session_start();
         float: right;
         justify-content: space-between;
         align-items: center;
-        margin-right: 25px;
-        width: 45%;
+        margin-right: 15px;
+        width: 35%;
         }
 
         #searchInput {
@@ -44,20 +44,6 @@ session_start();
         border-radius: 4px;
         font-size: 16px;
          }
-
-        #searchButton {
-        padding: 8px 16px;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 16px;
-        }
-
-        #searchButton:hover {
-            background-color: #0056b3;
-        }
 
         .sort-box {
             display: flex;
@@ -119,7 +105,6 @@ session_start();
             font-size: 1.2rem;
         }
 
-        /* Styles for product catalog */
         .product-catalog {
             display: flex;
             flex-wrap: wrap;
@@ -204,7 +189,6 @@ session_start();
     <div class="main-content">
     <div class="search">
         <input type="text" id="searchInput" placeholder="Search by title or author">
-        <button type="submit" id="searchButton">Search</button>
     </div>
     <div class="sort-box">
     <span class="SortLabel">Sort by:</span>
@@ -245,6 +229,13 @@ session_start();
                 <h3>Titanic Ship</h3>
                 <p>deskripsi singkat.</p>
                 <p>Published: 2019</p>
+                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="4" data-title="Jungle Book" data-description="This is the fiveth product." data-price="$12" data-url="checkout5.html" data-date-published="2023-04-01" data-date-added="2024-05-05">
+                <img src="product5.jpg" alt="Jungle Book">
+                <h3>Jungle Book</h3>
+                <p>deskripsi singkat.</p>
+                <p>Published: 2023</p>
                 <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
             </div>
             <!-- Add more product items as needed -->
@@ -339,7 +330,6 @@ session_start();
             const searchInput = document.getElementById('searchInput');
             const productCatalog = document.querySelector('.product-catalog');
 
-            // Function to filter product items based on search input
             function filterProducts(searchTerm) {
                 const products = Array.from(productCatalog.children);
 
@@ -355,7 +345,6 @@ session_start();
                 });
             }
 
-            // Event listener for search input
             searchInput.addEventListener('input', function () {
                 const searchTerm = this.value.trim().toLowerCase();
                 filterProducts(searchTerm);
