@@ -1,7 +1,7 @@
 <?php
 session_start();
 ?>
-m
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
