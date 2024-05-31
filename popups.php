@@ -135,7 +135,7 @@
         <ul>
             <li>Muhammad Rohan Kasyfillah (22081010289)</li>
             <li>Farhat Ibad Al Ghifari (22081010290)</li>
-            <li>Neo Ramadhani (22081010291)</li>
+            <li>Neo Ramadhani (22081010299)</li>
             <li>Zenryo Yudi Arnava Darva Mahendra (22081010292)</li>
             <li>Belia Putri Salsabila (22081010311)</li>
         </ul>
