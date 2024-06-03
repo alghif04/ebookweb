@@ -15,7 +15,7 @@
                 <input type="text" id="name" name="name" required>
             </div>
             <div class="form-group">
-                <label for="payment_method">Metode Pembayaran:</label>
+                <label for="payment_method">Pembayaran:</label>
                 <select id="payment_method" name="payment_method" required>
                     <option value="credit_card">Kartu Kredit</option>
                     <option value="paypal">PayPal</option>
