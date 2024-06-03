@@ -42,7 +42,7 @@ CREATE TABLE `books` (
 --
 
 INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `date_published`, `date_added`) VALUES
-(1, 'Jackporter', 'This is the first product.', 10.00, 'product1.jpg', '2019-01-01', '2024-01-05'),
+(1, 'The Last Of The Mohicans', 'the first product.', 10.00, 'Mohicans.jpeg', '2014-23-09', '2024-01-05'),
 (2, 'Dandelions', 'This is the second product.', 15.00, 'product2.jpg', '2021-02-01', '2024-02-05'),
 (3, 'Unhealthy', 'This is the third product.', 20.00, 'product3.jpg', '2023-03-01', '2024-03-05'),
 (4, 'Titanic Ship', 'This is the fourth product.', 25.00, 'product4.jpg', '2019-04-01', '2024-04-05');

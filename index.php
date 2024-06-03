@@ -241,11 +241,11 @@ session_start();
                 <p>Published: 2014</p>
                 <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
             </div>
-            <div class="product-item" data-id="2" data-title="Dandelions" data-author="Jane Smith" data-description="This is the second product." data-price="$15" data-url="checkout2.html" data-date-published="2021-02-01" data-date-added="2024-02-05" data-category="Romance">
-                <img src="product2.jpg" alt="Dandelions">
-                <h3>Dandelions</h3>
-                <p>Author: Jane Smith</p>
-                <p>deskripsi singkat.</p>
+            <div class="product-item" data-id="2" data-title="Unfinished Tales of Númenor and Middle-Earth" data-author="J.R.R. Tolkien" data-description="the second product." data-price="$15" data-url="checkout2.html" data-date-published="2022-14-07" data-date-added="2024-02-05" data-category="Fantasy">
+                <img src="Unfinished.jpg" alt="Unfinished Tales of Númenor and Middle-Earth">
+                <h3>Unfinished Tales of Númenor and Middle-Earth</h3>
+                <p>Author: J.R.R. Tolkien</p>
+                <p>"The Unfinished Tales of Númenor and Middle-Earth" provides a detailed exploration of Middle-earth's history and lore.</p>
                 <p>Published: 2021</p>
                 <button class="wishlist-button" onclick="addToWishlist(2)">♡ Wishlist</button>
             </div>
