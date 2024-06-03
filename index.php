@@ -231,7 +231,7 @@ session_start();
                 <p>Published: 2019</p>
                 <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
             </div>
-            <div class="product-item" data-id="4" data-title="Jungle Book" data-description="This is the fiveth product." data-price="$12" data-url="checkout5.html" data-date-published="2023-04-01" data-date-added="2024-05-05">
+            <div class="product-item" data-id="5" data-title="Jungle Book" data-description="This is the fiveth product." data-price="$12" data-url="checkout5.html" data-date-published="2023-04-01" data-date-added="2024-05-05">
                 <img src="product5.jpg" alt="Jungle Book">
                 <h3>Jungle Book</h3>
                 <p>deskripsi singkat.</p>
