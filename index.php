@@ -236,8 +236,6 @@ session_start();
                 <img src="Mohicans.jpeg" alt="The Last of the Mohicans">
                 <h3>The Last of the Mohicans</h3>
                 <p>Author: James Fenimore Cooper</p>
-                <p>"The Last of the Mohicans" is a classic tale of the American frontier, set during the French and Indian War.
-                </p>
                 <p>Published: 2014</p>
                 <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
             </div>
@@ -245,7 +243,6 @@ session_start();
                 <img src="Unfinished.jpg" alt="Unfinished Tales of Númenor and Middle-Earth">
                 <h3>Unfinished Tales of Númenor and Middle-Earth</h3>
                 <p>Author: J.R.R. Tolkien</p>
-                <p>"The Unfinished Tales of Númenor and Middle-Earth" provides a detailed exploration of Middle-earth's history and lore.</p>
                 <p>Published: 2021</p>
                 <button class="wishlist-button" onclick="addToWishlist(2)">♡ Wishlist</button>
             </div>
