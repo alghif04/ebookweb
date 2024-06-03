@@ -28,13 +28,13 @@ session_start();
         }
         
         .search {
-            position: relative;
-            display: flex; 
-            float: right;
-            justify-content: space-between;
+            position: fixed;
+            right: 15px;
+            display: flex;
+            justify-content: flex-end;
             align-items: center;
-            margin-right: 15px;
             width: 35%;
+            z-index: 1000; 
         }
 
         #searchInput {
