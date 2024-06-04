@@ -28,22 +28,22 @@ session_start();
         }
         
         .search {
-        position: relative;
-        display: flex; 
-        float: right;
-        justify-content: space-between;
-        align-items: center;
-        margin-right: 15px;
-        width: 35%;
+            position: fixed;
+            right: 15px;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            width: 35%;
+            z-index: 1000; 
         }
 
         #searchInput {
-        flex: 1;
-        padding: 8px 16px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        font-size: 16px;
-         }
+            flex: 1;
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
 
         .sort-box {
             display: flex;
@@ -105,6 +105,23 @@ session_start();
             font-size: 1.2rem;
         }
 
+        .category-filter {
+            margin-bottom: 20px;
+        }
+
+        .category-filter label {
+            margin-right: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .category-filter select {
+            padding: 8px 12px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
         .product-catalog {
             display: flex;
             flex-wrap: wrap;
@@ -163,6 +180,7 @@ session_start();
         .product-preview a:hover {
             text-decoration: underline;
         }
+
         .wishlist-button {
             display: inline-block;
             padding: 8px 12px;
@@ -187,11 +205,22 @@ session_start();
     <?php include 'header.php'; ?>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
-    <div class="search">
-        <input type="text" id="searchInput" placeholder="Search by title or author">
-    </div>
-    <div class="sort-box">
-    <span class="SortLabel">Sort by:</span>
+        <div class="search">
+            <input type="text" id="searchInput" placeholder="Search by title or author">
+        </div>
+        <div class="category">
+            <label for="categorySelect">Filter by category:</label>
+            <select id="categorySelect">
+                <option value="all">All</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Romance">Romance</option>
+                <option value="Thriller">Thriller</option>
+                <option value="Fantasy">Fantasy</option>
+                <option value="Horror">Horror</option>
+            </select>
+        </div>
+        <div class="sort-box">
+            <span class="SortLabel">Sort by:</span>
             <div class="SortContainer">
                 <span class="SortLabel"><a href="#" id="sort-title">Title</a></span>
             </div>
@@ -203,40 +232,82 @@ session_start();
             </div>
         </div>
         <div class="product-catalog">
-            <div class="product-item" data-id="1" data-title="Jackporter" data-description="This is the first product." data-price="$10" data-url="checkout1.html" data-date-published="2019-01-01" data-date-added="2024-01-05">
-                <img src="product1.jpg" alt="Jackporter">
-                <h3>Jackporter</h3>
-                <p>deskripsi singkat.</p>
-                <p>Published: 2019</p>
-             <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+            <div class="product-item" data-id="1" data-title="The Last of the Mohicans" data-author="James Fenimore Cooper" data-description="The Last of the Mohicans is a classic tale of the American frontier, set during the French and Indian War. It is the second book in James Fenimore Cooper's Leatherstocking Tales and stands as one of the greatest action stories ever told." data-price="IDR 93.000" data-url="checkout1.html" data-date-published="2014-09-23" data-date-added="2024-01-05" data-category="Adventure">
+                <img src="Mohicans.jpeg" alt="The Last of the Mohicans">
+                <h3>The Last of the Mohicans</h3>
+                <p>Author: James Fenimore Cooper</p>
+                <p>Published: 2014</p>
+                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
             </div>
-            <div class="product-item" data-id="2" data-title="Dandelions" data-description="This is the second product." data-price="$15" data-url="checkout2.html" data-date-published="2021-02-01" data-date-added="2024-02-05">
-                <img src="product2.jpg" alt="Dandelions">
-                <h3>Dandelions</h3>
-                <p>deskripsi singkat.</p>
+            <div class="product-item" data-id="2" data-title="Unfinished Tales of Númenor and Middle-Earth" data-author="J.R.R. Tolkien" data-description="This book explores Middle-earth's landscapes, lore, and history, featuring Gandalf's account of the Dwarves' meeting at Bag-End, Ulmo's encounter with Tuor on Beleriand's shores, and details on the Riders of Rohan's military structure and the Black Riders' pursuit of the Ring." data-price="IDR 115.000" data-url="checkout2.html" data-date-published="2022-07-14" data-date-added="2024-02-05" data-category="Fantasy">
+                <img src="Unfinished.jpg" alt="Unfinished Tales of Númenor and Middle-Earth">
+                <h3>Unfinished Tales of Númenor and Middle-Earth</h3>
+                <p>Author: J.R.R. Tolkien</p>
                 <p>Published: 2021</p>
-                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+                <button class="wishlist-button" onclick="addToWishlist(2)">♡ Wishlist</button>
             </div>
-            <div class="product-item" data-id="3" data-title="Unhealthy" data-description="This is the third product." data-price="$20" data-url="checkout3.html" data-date-published="2023-03-01" data-date-added="2024-03-05">
-                <img src="product3.jpg" alt="Unhealthy">
-                <h3>Unhealthy</h3>
-                <p>deskripsi singkat.</p>
-                <p>Published: 2023</p>
-                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+            <div class="product-item" data-id="3" data-title="Calamity" data-author="Brandon Sanderson"  data-description="the third product." data-price="IDR 102.000" data-url="checkout3.html" data-date-published="2016-12-01" data-date-added="2024-03-05" data-category="Thriller">
+                <img src="Calamity.jpg" alt="Calamity">
+                <h3>Calamity</h3>
+                <p>Author: Brandon Sanderson</p>
+                <p>Published: 2016</p>
+                <button class="wishlist-button" onclick="addToWishlist(3)">♡ Wishlist</button>
             </div>
-            <div class="product-item" data-id="4" data-title="Titanic Ship" data-description="This is the fourth product." data-price="$25" data-url="checkout4.html" data-date-published="2019-04-01" data-date-added="2024-04-05">
-                <img src="product4.jpg" alt="Titanic Ship">
-                <h3>Titanic Ship</h3>
-                <p>deskripsi singkat.</p>
-                <p>Published: 2019</p>
-                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+            <div class="product-item" data-id="4" data-title="Fire Fight" data-author="Brandon Sanderson" data-description="This is the fourth product." data-price="IDR 85.000" data-url="checkout4.html" data-date-published="2016-12-01" data-date-added="2024-04-05" data-category="Thriller">
+                <img src="Firefight.jpg" alt="Fire Fight">
+                <h3>Fire Fight</h3>
+                <p>Author: Brandon Sanderson</p>
+                <p>Published: 2016</p>
+                <button class="wishlist-button" onclick="addToWishlist(4)">♡ Wishlist</button>
             </div>
-            <div class="product-item" data-id="5" data-title="Jungle Book" data-description="This is the fiveth product." data-price="$12" data-url="checkout5.html" data-date-published="2023-04-01" data-date-added="2024-05-05">
-                <img src="product5.jpg" alt="Jungle Book">
-                <h3>Jungle Book</h3>
-                <p>deskripsi singkat.</p>
-                <p>Published: 2023</p>
-                <button class="wishlist-button" onclick="addToWishlist(1)">♡ Wishlist</button>
+            <div class="product-item" data-id="5" data-title="The Scorch Trials" data-author="James Dashner" data-description="This is the fiveth product." data-price="IDR 80.000" data-url="checkout5.html" data-date-published="2014-09-18" data-date-added="2024-05-05" data-category="Adventure">
+                <img src="Scorch.jpg" alt="The Scorch Trials">
+                <h3>The Scorch Trials</h3>
+                <p>Author: James Dashner</p>
+                <p>Published: 2014</p>
+                <button class="wishlist-button" onclick="addToWishlist(5)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="6" data-title="Red Queen" data-author="Victoria Aveyard" data-description="This is the sixth product." data-price="IDR 95.000" data-url="checkout6.html" data-date-published="2015-08-10" data-date-added="2024-05-06" data-category="Fantasy">
+                <img src="RedQ.jpg" alt="Red Queen">
+                <h3>Red Queen</h3>
+                <p>Author: Victoria Aveyard</p>
+                <p>Published: 2015</p>
+                <button class="wishlist-button" onclick="addToWishlist(5)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="7" data-title="A Discovery of Witches" data-author="Deborah Harkness" data-description="This is the seventh product." data-price="IDR 105.000" data-url="checkout7.html" data-date-published="2011-08-10" data-date-added="2024-05-06" data-category="Fantasy">
+                <img src="Witches.jpg" alt="A Discovery of Witches">
+                <h3>A Discovery of Witches</h3>
+                <p>Author: Deborah Harkness</p>
+                <p>Published: 2011</p>
+                <button class="wishlist-button" onclick="addToWishlist(5)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="8" data-title="Aku Tahu Kapan Kamu Mati" data-author="Arumi E" data-description="This is the eight product." data-price="IDR 75.000" data-url="checkout8.html" data-date-published="2018-09-19" data-date-added="2024-05-06" data-category="Horror">
+                <img src="KapanM.jpeg" alt="Aku Tahu Kapan Kamu Mati">
+                <h3>Aku Tahu Kapan Kamu Mati</h3>
+                <p>Author: Arumi E</p>
+                <p>Published: 2018</p>
+                <button class="wishlist-button" onclick="addToWishlist(5)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="9" data-title="Noir" data-author="Renita Nozaria" data-description="This is the nineth product." data-price="IDR 75.000" data-url="checkout9.html" data-date-published="2017-11-19" data-date-added="2024-05-07" data-category="Horror">
+                <img src="Noir.jpg" alt="Noir">
+                <h3>Noir</h3>
+                <p>Author: Renita Nozaria</p>
+                <p>Published: 2017</p>
+                <button class="wishlist-button" onclick="addToWishlist(5)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="10" data-title="Caraval" data-author="Stephanie Garber" data-description="This is the tenth product." data-price="IDR 95.000" data-url="checkout10.html" data-date-published="2022-06-20" data-date-added="2024-05-07" data-category="Romance">
+                <img src="Caraval.jpg" alt="Caraval">
+                <h3>Caraval</h3>
+                <p>Author: Stephanie Garber</p>
+                <p>Published: 2022</p>
+                <button class="wishlist-button" onclick="addToWishlist(5)">♡ Wishlist</button>
+            </div>
+            <div class="product-item" data-id="11" data-title="Your Party Girl" data-author="Lexie Xu" data-description="This is the eleventh product." data-price="IDR 75.000" data-url="checkout11.html" data-date-published="2018-01-28" data-date-added="2024-05-07" data-category="Romance">
+                <img src="PartyG.jpg" alt="Your Party Girl">
+                <h3>Your Party Girl</h3>
+                <p>Author: Lexie Xu</p>
+                <p>Published: 2018</p>
+                <button class="wishlist-button" onclick="addToWishlist(5)">♡ Wishlist</button>
             </div>
             <!-- Add more product items as needed -->
         </div>
@@ -328,16 +399,25 @@ session_start();
 
         document.addEventListener('DOMContentLoaded', function () {
             const searchInput = document.getElementById('searchInput');
+            const categorySelect = document.getElementById('categorySelect');
             const productCatalog = document.querySelector('.product-catalog');
 
-            function filterProducts(searchTerm) {
+            function filterProducts() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                const selectedCategory = categorySelect.value;
+
                 const products = Array.from(productCatalog.children);
 
                 products.forEach(product => {
                     const title = product.getAttribute('data-title').toLowerCase();
                     const description = product.getAttribute('data-description').toLowerCase();
+                    const author = product.getAttribute('data-author').toLowerCase();
+                    const category = product.getAttribute('data-category');
 
-                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                    const matchesSearch = title.includes(searchTerm) || description.includes(searchTerm) || author.includes(searchTerm);
+                    const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
+
+                    if (matchesSearch && matchesCategory) {
                         product.style.display = 'block';
                     } else {
                         product.style.display = 'none';
@@ -345,10 +425,8 @@ session_start();
                 });
             }
 
-            searchInput.addEventListener('input', function () {
-                const searchTerm = this.value.trim().toLowerCase();
-                filterProducts(searchTerm);
-            });
+            searchInput.addEventListener('input', filterProducts);
+            categorySelect.addEventListener('change', filterProducts);
         });
     </script>
 </body>
