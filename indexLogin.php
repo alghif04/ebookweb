@@ -341,9 +341,15 @@ session_start();
                 document.getElementById('product-preview').style.display = 'none';
             });
 
+            item.querySelector('.wishlist-button').addEventListener('click', function (event) {
+            event.stopPropagation();
+            const id = item.getAttribute('data-id');
+            window.location.href = `wishlist.php?id=${id}`;
+            });
+
             item.addEventListener('click', function () {
-                const id = this.getAttribute('data-id');
-                window.location.href = `informasi.php?id=${id}`;
+            const id = item.getAttribute('data-id');
+            window.location.href = `informasi.php?id=${id}`;
             });
         });
 

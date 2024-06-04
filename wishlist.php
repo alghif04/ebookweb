@@ -25,7 +25,7 @@ if (isset($_SESSION['user_id'])) {
     $stmt->close();
     $conn->close();
 } else {
-    header("Location: login.php");
+    header("Location: Login.php");
     exit();
 }
 ?>

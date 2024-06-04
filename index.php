@@ -341,9 +341,21 @@ session_start();
                 document.getElementById('product-preview').style.display = 'none';
             });
 
+            item.querySelector('.wishlist-button').addEventListener('click', function (event) {
+                event.stopPropagation();
+                const id = item.getAttribute('data-id');
+                <?php if(isset($_SESSION['username'])) { ?>
+                window.location.href = `wishlist.php?id=${id}`;
+                <?php } else { ?>
+                openPopup(event);
+                const popupImg = document.querySelector('.popup img');
+                popupImg.src = 'redx.png';
+                <?php } ?>
+            });
+
             item.addEventListener('click', function () {
-                const id = this.getAttribute('data-id');
-                window.location.href = `informasi.php?id=${id}`;
+            const id = item.getAttribute('data-id');
+            window.location.href = `informasi.php?id=${id}`;
             });
         });
 
