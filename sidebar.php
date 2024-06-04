@@ -176,7 +176,7 @@
                 <span class="tooltip">About</span>
             </li>
             <li>
-                <a href="#">
+                <a href="Settings.php">
                     <i class='bx bx-cog' ></i>
                     <span class="nav-item">Settings</span>
                 </a>
