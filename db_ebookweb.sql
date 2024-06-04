@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 28, 2024 at 02:22 PM
+-- Generation Time: Jun 04, 2024 at 08:04 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -68,6 +68,32 @@ INSERT INTO `user_details` (`user_id`, `username`, `email`, `password`) VALUES
 (2, 'bob123', 'bob123@gmail.com', '$2y$10$EEZlRnv7mf/29ZB0dwQUjutsrydElKIsWgL7cp.Pj9SowsXinKMxe'),
 (3, 'robin', 'robin123@gmail.com', '$2y$10$BesDSL2euap.ppCCRRwUTOu4WNDQUKLsjaVYJxQcmvGGK0EKiX406');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `wishlists`
+--
+
+CREATE TABLE `wishlists` (
+  `wishlist_id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `book_id` int(11) DEFAULT NULL,
+  `added_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `wishlists`
+--
+
+INSERT INTO `wishlists` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
+(7, 3, NULL, '2024-06-04 04:54:38'),
+(8, 3, NULL, '2024-06-04 04:54:42'),
+(11, 3, NULL, '2024-06-04 04:54:51'),
+(12, 3, NULL, '2024-06-04 04:55:00'),
+(13, 3, NULL, '2024-06-04 04:55:09'),
+(46, 3, NULL, '2024-06-04 05:31:46'),
+(47, 3, NULL, '2024-06-04 05:31:51');
+
 --
 -- Indexes for dumped tables
 --
@@ -85,6 +111,14 @@ ALTER TABLE `user_details`
   ADD PRIMARY KEY (`user_id`);
 
 --
+-- Indexes for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD PRIMARY KEY (`wishlist_id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `book_id` (`book_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -99,6 +133,23 @@ ALTER TABLE `books`
 --
 ALTER TABLE `user_details`
   MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `wishlists`
+--
+ALTER TABLE `wishlists`
+  ADD CONSTRAINT `wishlists_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_details` (`user_id`),
+  ADD CONSTRAINT `wishlists_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
