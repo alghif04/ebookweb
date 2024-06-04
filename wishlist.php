@@ -1,14 +1,43 @@
 <?php
 session_start();
+include 'dbconn.php';
+
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+
+    // Fetch unique wishlist items
+    $sql = "SELECT DISTINCT books.id, books.title, books.description, books.price, books.image_url, books.date_published
+            FROM books
+            JOIN wishlists ON books.id = wishlists.book_id
+            WHERE wishlists.user_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    $wishlisted_books = [];
+    if ($result->num_rows > 0) {
+        while ($row = $result->fetch_assoc()) {
+            $wishlisted_books[] = $row;
+        }
+    }
+
+    $stmt->close();
+    $conn->close();
+} else {
+    header("Location: login.php");
+    exit();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Readopolis</title>
+    <title>My Wishlist</title>
     <style>
-        * {
+       * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -168,133 +197,65 @@ session_start();
             color: #fff;
         }
     </style>
+<script>
+    function deleteFromWishlist(bookId) {
+        if (confirm("Are you sure you want to delete this book from your wishlist?")) {
+            const xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        alert(xhr.responseText);
+                        // Reload the wishlist after deletion
+                        location.reload();
+                    } else {
+                        alert("Error deleting book from wishlist.");
+                    }
+                }
+            };
+
+            xhr.open("POST", "delete_from_wishlist.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send("book_id=" + bookId);
+        }
+    }
+</script>
+
 </head>
 <body>
     <?php include 'header.php'; ?>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
-        <div class="search">
-            <input type="text" id="searchInput" placeholder="Search by title or author">
-        </div>
-        <div class="sort-box">
-            <span class="SortLabel">Sort by:</span>
-            <div class="SortContainer">
-                <span class="SortLabel"><a href="#" id="sort-title">Title</a></span>
-            </div>
-            <div class="SortContainer">
-                <span class="SortLabel"><a href="#" id="sort-date-published">Date Published</a></span>
-            </div>
-            <div class="SortContainer">
-                <span class="SortLabel"><a href="#" id="sort-date-added">Date Added</a></span>
-            </div>
-        </div>
+        <h1>My Wishlist</h1>
         <div class="product-catalog">
-            <?php
-            // Include your database connection and fetching logic
-            include 'dbconn.php'; 
+        <?php
+        if (empty($wishlisted_books)) {
+            echo "<p>Your wishlist is empty.</p>";
+        } else {
+            $addedBookIds = []; // Array to track added book IDs
 
-            // Fetch book data
-            $sql = "SELECT id, title, description, price, image_url, date_published, date_added FROM books";
-            $result = $conn->query($sql);
-
-            $books = [];
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    $books[] = $row;
+            foreach ($wishlisted_books as $book) {
+                $bookId = $book['id'];
+                // Check if the book ID is already added, skip if so
+                if (in_array($bookId, $addedBookIds)) {
+                    continue;
                 }
-            }
 
-            // Generate HTML for each book
-            foreach ($books as $book) {
-                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="checkout' . $book['id'] . '.html" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
+                // Add book ID to the tracking array
+                $addedBookIds[] = $bookId;
+
+                // Display the book in the wishlist
+                echo '<div class="product-item">';
                 echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
                 echo '<div class="product-item-content">';
                 echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
                 echo '<p>' . htmlspecialchars($book['description']) . '</p>';
                 echo '<p>Published: ' . date('Y', strtotime($book['date_published'])) . '</p>';
                 echo '</div>';
-                echo '<button class="wishlist-button" onclick="addToWishlist(' . $book['id'] . ')">♡ Wishlist</button>';
+                echo '<button onclick="deleteFromWishlist(' . $book['id'] . ')">Remove from Wishlist</button>';
                 echo '</div>';
             }
-            ?>
-        </div>
-        <div class="product-preview" id="product-preview">
-            <h3 id="preview-title">Product Title</h3>
-            <p id="preview-description">Product description will appear here when you hover over a product.</p>
-            <a id="preview-price" href="#" target="_blank">Price</a>
-        </div>
-    </div>
-    <script>
-document.querySelectorAll('.product-item').forEach(item => {
-    const wishlistButton = item.querySelector('.wishlist-button');
-    wishlistButton.addEventListener('click', function (event) {
-        event.preventDefault(); // Prevent default form submission
-        event.stopPropagation(); // Stop event propagation
-
-        const id = item.getAttribute('data-id');
-        addToWishlist(id, wishlistButton); // Pass the button directly to addToWishlist
-
-        wishlistButton.disabled = true; // Disable the button immediately after click
-    });
-});
-
-function addToWishlist(id, buttonElement) {
-    console.log('Adding book to wishlist with ID:', id);
-
-    // Disable the button to prevent multiple clicks
-    buttonElement.disabled = true;
-
-    <?php if (isset($_SESSION['username'])) { ?>
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "wishlist_handler.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            if (response.status === 'success') {
-                alert('Book added to wishlist');
-            } else {
-                alert(response.message);
-            }
-            buttonElement.disabled = false; // Re-enable the button after handling the response
         }
-    };
-
-    xhr.send(`book_id=${id}`);
-    <?php } else { ?>
-    openPopup(event);
-    <?php } ?>
-}
-
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
-    const productCatalog = document.querySelector('.product-catalog');
-
-    function filterProducts(searchTerm) {
-        const products = Array.from(productCatalog.children);
-
-        products.forEach(product => {
-            const title = product.getAttribute('data-title').toLowerCase();
-            const description = product.getAttribute('data-description').toLowerCase();
-
-            if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                product.style.display = 'block';
-            } else {
-                product.style.display = 'none';
-            }
-        });
-    }
-    searchInput.addEventListener('input', function () {
-        const searchTerm = this.value.trim().toLowerCase();
-        filterProducts(searchTerm);
-    });
-});
-
-
-
-    </script>
+        ?>
+    </div>
 </body>
 </html>
