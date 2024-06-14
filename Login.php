@@ -91,10 +91,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $username = filter_input(INPUT_POST, "login-username", FILTER_SANITIZE_SPECIAL_CHARS);
             $password = filter_input(INPUT_POST, "login-password", FILTER_SANITIZE_SPECIAL_CHARS);
 
-            if (empty($username)) {
-                echo '<script> alert ("Please enter a username")</script>'; 
-            } elseif (empty($password)) {
-                echo '<script> alert ("Please enter a password")</script>';
+            if (empty($username) || empty($password)) {
+                echo '<script>alert("Please enter both username and password.")</script>';
             } else {
                 $sql = "SELECT * FROM user_details WHERE username = '$username'";
                 $result = mysqli_query($conn, $sql);
@@ -102,22 +100,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (mysqli_num_rows($result) == 1) {
                     $user = mysqli_fetch_assoc($result);
                     if (password_verify($password, $user['password'])) {
-                        echo '<script> alert ("Login successful!")</script>';
-                        $_SESSION['username'] = $username;
-                        $_SESSION['user_id'] = $user['user_id'];  // Set user_id in session
-                        
-                        header("Location: indexLogin.php"); // Redirect
-                        exit;
+                        if ($user['is_admin'] == 1) {
+                            $_SESSION['username'] = $username;
+                            $_SESSION['user_id'] = $user['user_id'];
+                            header("Location: indexAdmin.php"); // Redirect admin to admin page
+                            exit;
+                        } else {
+                            $_SESSION['username'] = $username;
+                            $_SESSION['user_id'] = $user['user_id'];
+                            header("Location: indexLogin.php"); // Redirect regular user to regular page
+                            exit;
+                        }
                     } else {
-                        echo '<script> alert ("Incorrect password")</script>';
+                        echo '<script>alert("Incorrect password.")</script>';
                     }
                 } else {
-                    echo '<script> alert ("Username not found")</script>';
+                    echo '<script>alert("Username not found.")</script>';
                 }
             }
         }
     }
 }
-
 mysqli_close($conn);
 ?>

@@ -176,11 +176,11 @@
                 <span class="tooltip">About</span>
             </li>
             <li>
-                <a href="#">
-                    <i class='bx bx-cog' ></i>
-                    <span class="nav-item">Settings</span>
+                <a href="<?php echo isset($_SESSION['username']) ? 'cart.php' : '#'; ?>" <?php echo !isset($_SESSION['username']) ? 'onclick="openPopup(event)"' : ''; ?>>
+                    <i class='bx bxs-cart'></i>
+                    <span class="nav-item">Cart</span>
                 </a>
-                <span class="tooltip">Settings</span>
+                <span class="tooltip">Cart</span>
             </li>
             <li>
                 <?php if (isset($_SESSION['username'])): ?>

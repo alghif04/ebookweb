@@ -8,8 +8,8 @@ if (isset($_SESSION['user_id'])) {
     // Fetch unique wishlist items
     $sql = "SELECT DISTINCT books.id, books.title, books.description, books.price, books.image_url, books.date_published
             FROM books
-            JOIN wishlists ON books.id = wishlists.book_id
-            WHERE wishlists.user_id = ?";
+            JOIN wishlist ON books.id = wishlist.book_id
+            WHERE wishlist.user_id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $user_id);
     $stmt->execute();

@@ -6,7 +6,7 @@ if (isset($_SESSION['username'])) {
     $user_id = $_SESSION['user_id'];
     $book_id = $_POST['book_id'];
 
-    $sql = "INSERT INTO wishlists (user_id, book_id) VALUES (?, ?)";
+    $sql = "INSERT INTO wishlist (user_id, book_id) VALUES (?, ?)";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ii", $user_id, $book_id);
 

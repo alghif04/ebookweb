@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 04, 2024 at 08:04 AM
+-- Generation Time: Jun 14, 2024 at 02:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -42,10 +42,7 @@ CREATE TABLE `books` (
 --
 
 INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `date_published`, `date_added`) VALUES
-(1, 'Jackporter', 'This is the first product.', 10.00, 'product1.jpg', '2019-01-01', '2024-01-05'),
-(2, 'Dandelions', 'This is the second product.', 15.00, 'product2.jpg', '2021-02-01', '2024-02-05'),
-(3, 'Unhealthy', 'This is the third product.', 20.00, 'product3.jpg', '2023-03-01', '2024-03-05'),
-(4, 'Titanic Ship', 'This is the fourth product.', 25.00, 'product4.jpg', '2019-04-01', '2024-04-05');
+(18, 'Frieren', 'KILL YOURSELF NOW', 1000.00, 'uploads/F-lT9LlagAAUc4n.png', '2024-06-14', '2024-06-14');
 
 -- --------------------------------------------------------
 
@@ -57,24 +54,25 @@ CREATE TABLE `user_details` (
   `user_id` int(11) NOT NULL,
   `username` text NOT NULL,
   `email` text NOT NULL,
-  `password` text NOT NULL
+  `password` text NOT NULL,
+  `is_admin` int(11) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user_details`
 --
 
-INSERT INTO `user_details` (`user_id`, `username`, `email`, `password`) VALUES
-(2, 'bob123', 'bob123@gmail.com', '$2y$10$EEZlRnv7mf/29ZB0dwQUjutsrydElKIsWgL7cp.Pj9SowsXinKMxe'),
-(3, 'robin', 'robin123@gmail.com', '$2y$10$BesDSL2euap.ppCCRRwUTOu4WNDQUKLsjaVYJxQcmvGGK0EKiX406');
+INSERT INTO `user_details` (`user_id`, `username`, `email`, `password`, `is_admin`) VALUES
+(3, 'robin', 'robin123@gmail.com', '$2y$10$BesDSL2euap.ppCCRRwUTOu4WNDQUKLsjaVYJxQcmvGGK0EKiX406', 0),
+(4, 'tunguska', 'tunguska@gmail.com', '$2y$10$N2gM3/qo4KhoVgMC9XnLquc9RuwODq37z0.xxbkJt2IfbT26j46Ii', 1);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `wishlists`
+-- Table structure for table `wishlist`
 --
 
-CREATE TABLE `wishlists` (
+CREATE TABLE `wishlist` (
   `wishlist_id` int(11) NOT NULL,
   `user_id` int(11) DEFAULT NULL,
   `book_id` int(11) DEFAULT NULL,
@@ -82,17 +80,11 @@ CREATE TABLE `wishlists` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `wishlists`
+-- Dumping data for table `wishlist`
 --
 
-INSERT INTO `wishlists` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
-(7, 3, NULL, '2024-06-04 04:54:38'),
-(8, 3, NULL, '2024-06-04 04:54:42'),
-(11, 3, NULL, '2024-06-04 04:54:51'),
-(12, 3, NULL, '2024-06-04 04:55:00'),
-(13, 3, NULL, '2024-06-04 04:55:09'),
-(46, 3, NULL, '2024-06-04 05:31:46'),
-(47, 3, NULL, '2024-06-04 05:31:51');
+INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
+(61, 3, 18, '2024-06-14 12:03:00');
 
 --
 -- Indexes for dumped tables
@@ -111,9 +103,9 @@ ALTER TABLE `user_details`
   ADD PRIMARY KEY (`user_id`);
 
 --
--- Indexes for table `wishlists`
+-- Indexes for table `wishlist`
 --
-ALTER TABLE `wishlists`
+ALTER TABLE `wishlist`
   ADD PRIMARY KEY (`wishlist_id`),
   ADD KEY `user_id` (`user_id`),
   ADD KEY `book_id` (`book_id`);
@@ -126,30 +118,31 @@ ALTER TABLE `wishlists`
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `user_details`
 --
 ALTER TABLE `user_details`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT for table `wishlists`
+-- AUTO_INCREMENT for table `wishlist`
 --
-ALTER TABLE `wishlists`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
+ALTER TABLE `wishlist`
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `wishlists`
+-- Constraints for table `wishlist`
 --
-ALTER TABLE `wishlists`
-  ADD CONSTRAINT `wishlists_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_details` (`user_id`),
-  ADD CONSTRAINT `wishlists_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`);
+ALTER TABLE `wishlist`
+  ADD CONSTRAINT `fk_book_id` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `wishlist_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_details` (`user_id`),
+  ADD CONSTRAINT `wishlist_ibfk_2` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
