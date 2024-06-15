@@ -65,9 +65,9 @@
                 <p>harga :Rp.......</p>
             </div>
             <div class="checkout-button">
-                <form action="checkout.php" method="POST">
+                <form action="chart.php" method="POST">
                     <input type="hidden"name="book_id"value="1">
-                    <button type="submit">Checkout</button>
+                    <button type="submit">Masukan Ke Keranjang</button>
                 </form>
             </div>
         </div>
