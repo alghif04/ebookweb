@@ -18,9 +18,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['book_id'])) {
             $deleteWishlistQuery = "DELETE FROM wishlist WHERE book_id = $bookId";
             $conn->query($deleteWishlistQuery);
 
-            // Delete image file from uploads folder
+            // Delete image file from uploads folder and resized image if it exists
             if (file_exists($imageUrl)) {
                 unlink($imageUrl);
+            }
+            $resizedImageUrl = 'uploads/resized_' . basename($imageUrl);
+            if (file_exists($resizedImageUrl)) {
+                unlink($resizedImageUrl);
             }
 
             echo json_encode(['status' => 'success', 'message' => 'Book deleted successfully.']);

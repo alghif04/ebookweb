@@ -170,7 +170,7 @@ session_start();
     </style>
 </head>
 <body>
-    <?php include 'header.php'; ?>
+<?php include 'header.php'; ?>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
         <div class="search">
@@ -188,6 +188,7 @@ session_start();
                 <span class="SortLabel"><a href="#" id="sort-date-added">Date Added</a></span>
             </div>
         </div>
+
         <div class="product-catalog">
             <?php
             // Include your database connection and fetching logic
@@ -206,12 +207,11 @@ session_start();
 
             // Generate HTML for each book
             foreach ($books as $book) {
-                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="checkout' . $book['id'] . '.html" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
+                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="viewBook.php?id=' . $book['id'] . '" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
                 echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
                 echo '<div class="product-item-content">';
                 echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
-                echo '<p>' . htmlspecialchars($book['description']) . '</p>';
-                echo '<p>Published: ' . date('Y', strtotime($book['date_published'])) . '</p>';
+                echo '<p>$' . $book['price'] . '</p>';
                 echo '</div>';
                 echo '<button class="wishlist-button" onclick="addToWishlist(' . $book['id'] . ')">♡ Wishlist</button>';
                 echo '</div>';
@@ -293,6 +293,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+document.querySelectorAll('.product-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                window.location.href = url;
+            });
+        });
 
 
     </script>

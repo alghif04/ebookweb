@@ -167,7 +167,7 @@
     </style>
 </head>
 <body>
-    <?php include 'header.php'; ?>
+<?php include 'header.php'; ?>
     <?php include 'sidebar.php'; ?>
     <div class="main-content">
         <div class="search">
@@ -185,6 +185,7 @@
                 <span class="SortLabel"><a href="#" id="sort-date-added">Date Added</a></span>
             </div>
         </div>
+
         <div class="product-catalog">
             <?php
             // Include your database connection and fetching logic
@@ -203,12 +204,11 @@
 
             // Generate HTML for each book
             foreach ($books as $book) {
-                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="checkout' . $book['id'] . '.html" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
+                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="viewBook.php?id=' . $book['id'] . '" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
                 echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
                 echo '<div class="product-item-content">';
                 echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
-                echo '<p>' . htmlspecialchars($book['description']) . '</p>';
-                echo '<p>Published: ' . date('Y', strtotime($book['date_published'])) . '</p>';
+                echo '<p>$' . $book['price'] . '</p>';
                 echo '</div>';
                 echo '<button class="wishlist-button" onclick="addToWishlist(' . $book['id'] . ')">♡ Wishlist</button>';
                 echo '</div>';
@@ -222,125 +222,82 @@
         </div>
     </div>
     <script>
-        document.querySelectorAll('.product-item').forEach(item => {
-            item.addEventListener('mouseover', function () {
-                const title = this.getAttribute('data-title');
-                const description = this.getAttribute('data-description');
-                const price = this.getAttribute('data-price');
-                const url = this.getAttribute('data-url');
-
-                const preview = document.getElementById('product-preview');
-                document.getElementById('preview-title').textContent = title;
-                document.getElementById('preview-description').textContent = description;
-                const priceElement = document.getElementById('preview-price');
-                priceElement.textContent = price;
-                priceElement.href = url;
-
-                preview.style.display = 'block';
-                preview.style.top = `${this.offsetTop}px`;
-                preview.style.left = `${this.offsetLeft + this.offsetWidth + 10}px`;
-            });
-
-            item.addEventListener('mouseout', function () {
-                document.getElementById('product-preview').style.display = 'none';
-            });
-
-            item.addEventListener('click', function (event) {
-        const id = this.getAttribute('data-id');
-        window.location.href = `informasi.php?id=${id}`;
-    });
-
+document.querySelectorAll('.product-item').forEach(item => {
     const wishlistButton = item.querySelector('.wishlist-button');
     wishlistButton.addEventListener('click', function (event) {
-        <?php if (isset($_SESSION['username'])) { ?>
-            const id = this.parentElement.getAttribute('data-id');
-            addToWishlist(id);
-        <?php } else { ?>
-            event.preventDefault(); // Prevent default click action
-            openPopup(event); // Show login popup
-        <?php } ?>
-        event.stopPropagation(); // Prevent event bubbling
+        event.preventDefault(); // Prevent default form submission
+        event.stopPropagation(); // Stop event propagation
+
+        const id = item.getAttribute('data-id');
+        addToWishlist(id, wishlistButton); // Pass the button directly to addToWishlist
+
+        wishlistButton.disabled = true; // Disable the button immediately after click
     });
 });
 
-        function sortProducts(criteria) {
-            const catalog = document.querySelector('.product-catalog');
-            const products = Array.from(catalog.children);
+function addToWishlist(id, buttonElement) {
+    console.log('Adding book to wishlist with ID:', id);
 
-            products.sort((a, b) => {
-                const aValue = a.getAttribute(`data-${criteria}`).toLowerCase();
-                const bValue = b.getAttribute(`data-${criteria}`).toLowerCase();
+    // Disable the button to prevent multiple clicks
+    buttonElement.disabled = true;
 
-                if (criteria === 'title') {
-                    return aValue.localeCompare(bValue);
-                } else {
-                    return new Date(aValue) - new Date(bValue);
-                }
-            });
-
-            catalog.innerHTML = '';
-            products.forEach(product => catalog.appendChild(product));
-        }
-
-        document.getElementById('sort-title').addEventListener('click', (e) => {
-            e.preventDefault();
-            sortProducts('title');
-        });
-
-        document.getElementById('sort-date-published').addEventListener('click', (e) => {
-            e.preventDefault();
-            sortProducts('date-published');
-        });
-
-        document.getElementById('sort-date-added').addEventListener('click', (e) => {
-            e.preventDefault();
-            sortProducts('date-added');
-        });
-
-        function addToWishlist(id) {
     <?php if (isset($_SESSION['username'])) { ?>
-        const product = document.querySelector(`.product-item[data-id="${id}"]`);
-        const title = product.getAttribute('data-title');
-        const description = product.getAttribute('data-description');
-        const price = product.getAttribute('data-price');
-        const url = product.getAttribute('data-url');
-        const datePublished = product.getAttribute('data-date-published');
-        const dateAdded = product.getAttribute('data-date-added');
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "wishlist_handler.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-        const wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
-        wishlist.push({ id, title, description, price, url, datePublished, dateAdded });
-        localStorage.setItem('wishlist', JSON.stringify(wishlist));
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.status === 'success') {
+                alert('Book added to wishlist');
+            } else {
+                alert(response.message);
+            }
+            buttonElement.disabled = false; // Re-enable the button after handling the response
+        }
+    };
 
+    xhr.send(`book_id=${id}`);
     <?php } else { ?>
-        openPopup(event);
+    openPopup(event);
     <?php } ?>
 }
 
 
-        document.addEventListener('DOMContentLoaded', function () {
-            const searchInput = document.getElementById('searchInput');
-            const productCatalog = document.querySelector('.product-catalog');
 
-            function filterProducts(searchTerm) {
-                const products = Array.from(productCatalog.children);
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const productCatalog = document.querySelector('.product-catalog');
 
-                products.forEach(product => {
-                    const title = product.getAttribute('data-title').toLowerCase();
-                    const description = product.getAttribute('data-description').toLowerCase();
+    function filterProducts(searchTerm) {
+        const products = Array.from(productCatalog.children);
 
-                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                        product.style.display = 'block';
-                    } else {
-                        product.style.display = 'none';
-                    }
-                });
+        products.forEach(product => {
+            const title = product.getAttribute('data-title').toLowerCase();
+            const description = product.getAttribute('data-description').toLowerCase();
+
+            if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                product.style.display = 'block';
+            } else {
+                product.style.display = 'none';
             }
+        });
+    }
+    searchInput.addEventListener('input', function () {
+        const searchTerm = this.value.trim().toLowerCase();
+        filterProducts(searchTerm);
+    });
+});
 
-            searchInput.addEventListener('input', function () {
-                const searchTerm = this.value.trim().toLowerCase();
-                filterProducts(searchTerm);
+document.querySelectorAll('.product-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const url = this.getAttribute('data-url');
+                window.location.href = url;
             });
         });
+
+
     </script>
 </body>
 </html>
