@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2024 at 09:16 AM
+-- Generation Time: Jun 16, 2024 at 04:38 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -129,7 +129,7 @@ CREATE TABLE `ratings` (
 --
 
 INSERT INTO `ratings` (`id`, `book_id`, `user_id`, `rating`, `comment`, `created_at`) VALUES
-(2, 30, 3, 5, 'I love slime', '2024-06-16 07:15:38');
+(20, 30, 3, 5, 'i love rimuru', '2024-06-16 14:33:50');
 
 -- --------------------------------------------------------
 
@@ -171,7 +171,8 @@ CREATE TABLE `wishlist` (
 --
 
 INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
-(64, 3, 28, '2024-06-16 05:17:37');
+(64, 3, 28, '2024-06-16 05:17:37'),
+(65, 3, 30, '2024-06-16 10:31:04');
 
 --
 -- Indexes for dumped tables
@@ -252,7 +253,7 @@ ALTER TABLE `genres`
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `user_details`
@@ -264,7 +265,7 @@ ALTER TABLE `user_details`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
 
 --
 -- Constraints for dumped tables
