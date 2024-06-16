@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 14, 2024 at 02:06 PM
+-- Generation Time: Jun 16, 2024 at 06:19 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -34,15 +34,56 @@ CREATE TABLE `books` (
   `price` decimal(10,2) DEFAULT NULL,
   `image_url` varchar(255) DEFAULT NULL,
   `date_published` date DEFAULT NULL,
-  `date_added` date DEFAULT NULL
+  `date_added` date DEFAULT NULL,
+  `author` varchar(255) DEFAULT NULL,
+  `publisher` varchar(255) DEFAULT NULL,
+  `isbn` varchar(20) NOT NULL,
+  `pages` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `books`
 --
 
-INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `date_published`, `date_added`) VALUES
-(18, 'Frieren', 'KILL YOURSELF NOW', 1000.00, 'uploads/F-lT9LlagAAUc4n.png', '2024-06-14', '2024-06-14');
+INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `date_published`, `date_added`, `author`, `publisher`, `isbn`, `pages`) VALUES
+(26, 'Two Retards Agreeing', 'OMG IS THAT A TNO REFERENCE', 123.00, 'uploads/resized_its-over-for-the-soviet-union-v0-81xe0h11318c1.jpeg', '2024-06-05', '2024-06-16', 'Pink Panzer', 'TNO', '11111111111111111', 24);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `book_genres`
+--
+
+CREATE TABLE `book_genres` (
+  `book_id` int(11) NOT NULL,
+  `genre_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `book_genres`
+--
+
+INSERT INTO `book_genres` (`book_id`, `genre_id`) VALUES
+(26, 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `genres`
+--
+
+CREATE TABLE `genres` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `genres`
+--
+
+INSERT INTO `genres` (`id`, `name`) VALUES
+(2, 'Horror'),
+(1, 'Manga');
 
 -- --------------------------------------------------------
 
@@ -80,13 +121,6 @@ CREATE TABLE `wishlist` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `wishlist`
---
-
-INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
-(61, 3, 18, '2024-06-14 12:03:00');
-
---
 -- Indexes for dumped tables
 --
 
@@ -95,6 +129,20 @@ INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
 --
 ALTER TABLE `books`
   ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `book_genres`
+--
+ALTER TABLE `book_genres`
+  ADD PRIMARY KEY (`book_id`,`genre_id`),
+  ADD KEY `genre_id` (`genre_id`);
+
+--
+-- Indexes for table `genres`
+--
+ALTER TABLE `genres`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `user_details`
@@ -118,7 +166,13 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+
+--
+-- AUTO_INCREMENT for table `genres`
+--
+ALTER TABLE `genres`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `user_details`
@@ -130,11 +184,18 @@ ALTER TABLE `user_details`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `book_genres`
+--
+ALTER TABLE `book_genres`
+  ADD CONSTRAINT `book_genres_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `book_genres_ibfk_2` FOREIGN KEY (`genre_id`) REFERENCES `genres` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `wishlist`
