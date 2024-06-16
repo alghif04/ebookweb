@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2024 at 06:19 AM
+-- Generation Time: Jun 16, 2024 at 09:16 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,6 +24,26 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `authors`
+--
+
+CREATE TABLE `authors` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `authors`
+--
+
+INSERT INTO `authors` (`id`, `name`) VALUES
+(1, 'TNO'),
+(2, 'Kadokawa'),
+(3, 'yenisey');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `books`
 --
 
@@ -35,7 +55,8 @@ CREATE TABLE `books` (
   `image_url` varchar(255) DEFAULT NULL,
   `date_published` date DEFAULT NULL,
   `date_added` date DEFAULT NULL,
-  `author` varchar(255) DEFAULT NULL,
+  `language` varchar(50) NOT NULL,
+  `author_id` int(11) NOT NULL,
   `publisher` varchar(255) DEFAULT NULL,
   `isbn` varchar(20) NOT NULL,
   `pages` int(11) NOT NULL
@@ -45,8 +66,9 @@ CREATE TABLE `books` (
 -- Dumping data for table `books`
 --
 
-INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `date_published`, `date_added`, `author`, `publisher`, `isbn`, `pages`) VALUES
-(26, 'Two Retards Agreeing', 'OMG IS THAT A TNO REFERENCE', 123.00, 'uploads/resized_its-over-for-the-soviet-union-v0-81xe0h11318c1.jpeg', '2024-06-05', '2024-06-16', 'Pink Panzer', 'TNO', '11111111111111111', 24);
+INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `date_published`, `date_added`, `language`, `author_id`, `publisher`, `isbn`, `pages`) VALUES
+(28, 'elaina', 'Elaina the ashen witch', 111.00, 'uploads/resized_assa.PNG', '2024-06-28', '2024-06-16', 'English', 2, 'Japan', '11111111111111', 34),
+(30, 'Rimuru', 'Slime reincarnated', 142.00, 'uploads/resized_FLjZCp1XsAQU5gu.jpg', '2024-06-13', '2024-06-16', 'Japanese', 2, 'Japan', '212121212', 23);
 
 -- --------------------------------------------------------
 
@@ -64,7 +86,9 @@ CREATE TABLE `book_genres` (
 --
 
 INSERT INTO `book_genres` (`book_id`, `genre_id`) VALUES
-(26, 2);
+(28, 1),
+(30, 1),
+(30, 2);
 
 -- --------------------------------------------------------
 
@@ -84,6 +108,28 @@ CREATE TABLE `genres` (
 INSERT INTO `genres` (`id`, `name`) VALUES
 (2, 'Horror'),
 (1, 'Manga');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ratings`
+--
+
+CREATE TABLE `ratings` (
+  `id` int(11) NOT NULL,
+  `book_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `rating` int(11) NOT NULL CHECK (`rating` between 1 and 5),
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ratings`
+--
+
+INSERT INTO `ratings` (`id`, `book_id`, `user_id`, `rating`, `comment`, `created_at`) VALUES
+(2, 30, 3, 5, 'I love slime', '2024-06-16 07:15:38');
 
 -- --------------------------------------------------------
 
@@ -121,14 +167,28 @@ CREATE TABLE `wishlist` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Dumping data for table `wishlist`
+--
+
+INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
+(64, 3, 28, '2024-06-16 05:17:37');
+
+--
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `authors`
+--
+ALTER TABLE `authors`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `books`
 --
 ALTER TABLE `books`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_author` (`author_id`);
 
 --
 -- Indexes for table `book_genres`
@@ -143,6 +203,14 @@ ALTER TABLE `book_genres`
 ALTER TABLE `genres`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
+
+--
+-- Indexes for table `ratings`
+--
+ALTER TABLE `ratings`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `book_id` (`book_id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `user_details`
@@ -163,15 +231,27 @@ ALTER TABLE `wishlist`
 --
 
 --
+-- AUTO_INCREMENT for table `authors`
+--
+ALTER TABLE `authors`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `genres`
 --
 ALTER TABLE `genres`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `ratings`
+--
+ALTER TABLE `ratings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
@@ -184,11 +264,17 @@ ALTER TABLE `user_details`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `books`
+--
+ALTER TABLE `books`
+  ADD CONSTRAINT `fk_author` FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`);
 
 --
 -- Constraints for table `book_genres`
@@ -196,6 +282,13 @@ ALTER TABLE `wishlist`
 ALTER TABLE `book_genres`
   ADD CONSTRAINT `book_genres_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `book_genres_ibfk_2` FOREIGN KEY (`genre_id`) REFERENCES `genres` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `ratings`
+--
+ALTER TABLE `ratings`
+  ADD CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `ratings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_details` (`user_id`);
 
 --
 -- Constraints for table `wishlist`

@@ -37,7 +37,7 @@ if (isset($_SESSION['user_id'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Wishlist</title>
     <style>
-       * {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -132,6 +132,8 @@ if (isset($_SESSION['user_id'])) {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            text-decoration: none;
+            color: inherit;
         }
 
         .product-item:hover {
@@ -197,29 +199,29 @@ if (isset($_SESSION['user_id'])) {
             color: #fff;
         }
     </style>
-<script>
-    function deleteFromWishlist(bookId) {
-        if (confirm("Are you sure you want to delete this book from your wishlist?")) {
-            const xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        alert(xhr.responseText);
-                        // Reload the wishlist after deletion
-                        location.reload();
-                    } else {
-                        alert("Error deleting book from wishlist.");
+    <script>
+        function deleteFromWishlist(event, bookId) {
+            event.preventDefault();
+            if (confirm("Are you sure you want to delete this book from your wishlist?")) {
+                const xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState === XMLHttpRequest.DONE) {
+                        if (xhr.status === 200) {
+                            alert(xhr.responseText);
+                            // Reload the wishlist after deletion
+                            location.reload();
+                        } else {
+                            alert("Error deleting book from wishlist.");
+                        }
                     }
-                }
-            };
+                };
 
-            xhr.open("POST", "delete_from_wishlist.php", true);
-            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-            xhr.send("book_id=" + bookId);
+                xhr.open("POST", "delete_from_wishlist.php", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                xhr.send("book_id=" + bookId);
+            }
         }
-    }
-</script>
-
+    </script>
 </head>
 <body>
     <?php include 'header.php'; ?>
@@ -244,15 +246,14 @@ if (isset($_SESSION['user_id'])) {
                 $addedBookIds[] = $bookId;
 
                 // Display the book in the wishlist
-                echo '<div class="product-item">';
+                echo '<a href="viewBook.php?id=' . $bookId . '" class="product-item">';
                 echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
                 echo '<div class="product-item-content">';
                 echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
-                echo '<p>' . htmlspecialchars($book['description']) . '</p>';
-                echo '<p>Published: ' . date('Y', strtotime($book['date_published'])) . '</p>';
+                echo '<p>Price: $' . htmlspecialchars(number_format($book['price'], 2)) . '</p>';
                 echo '</div>';
-                echo '<button onclick="deleteFromWishlist(' . $book['id'] . ')">Remove from Wishlist</button>';
-                echo '</div>';
+                echo '<button onclick="deleteFromWishlist(event, ' . $book['id'] . ')">Remove from Wishlist</button>';
+                echo '</a>';
             }
         }
         ?>

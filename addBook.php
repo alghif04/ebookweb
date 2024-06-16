@@ -41,59 +41,78 @@ function resizeImage($sourcePath, $targetPath, $width, $height) {
 
     return true;
 }
-
 // Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['submit'])) {
-        // Get form data
-        $title = $_POST['title'];
-        $description = $_POST['description'];
-        $price = $_POST['price'];
-        $date_published = $_POST['date_published'];
-        $author = $_POST['author'];
-        $publisher = $_POST['publisher'];
-        $isbn = $_POST['isbn'];
-        $pages = $_POST['pages'];
-        $genres = $_POST['genres']; // Array of genre IDs
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
+    // Get form data
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    $price = $_POST['price'];
+    $date_published = $_POST['date_published'];
+    $authorName = $_POST['author']; // Updated variable name to avoid confusion with ID
+    $publisher = $_POST['publisher'];
+    $isbn = $_POST['isbn'];
+    $pages = $_POST['pages'];
+    $language = $_POST['language']; // New field for language
+    $genres = $_POST['genres']; // Array of genre IDs
 
-        // Default image path
-        $image = $defaultImagePath;
+    // Check if the author exists in the database
+    $checkAuthorQuery = "SELECT id FROM authors WHERE name = '$authorName'";
+    $authorResult = $conn->query($checkAuthorQuery);
 
-        // Handling image upload and resize
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $tmp_name = $_FILES['image']['tmp_name'];
-            $filename = basename($_FILES['image']['name']);
-            $uploadPath = $uploadDirectory . $filename; // Final uploaded image path
-            move_uploaded_file($tmp_name, $uploadPath);
-
-            // Resize uploaded image to 900x600
-            $resizedImagePath = $uploadDirectory . 'resized_' . $filename;
-            resizeImage($uploadPath, $resizedImagePath, 600, 900);
-
-            // Delete the original uploaded image
-            unlink($uploadPath);
-
-            $image = $resizedImagePath; // Use the resized image path
-        }
-
-        // Prepare and execute SQL query to insert data into 'books' table
-        $sql = "INSERT INTO books (title, description, price, image_url, date_published, date_added, author, publisher, isbn, pages) 
-                VALUES ('$title', '$description', '$price', '$image', '$date_published', NOW(), '$author', '$publisher', '$isbn', '$pages')";
-
-        if ($conn->query($sql) === TRUE) {
-            $book_id = $conn->insert_id; // Get the inserted book's ID
-
-            // Insert genres into the book_genres table
-            foreach ($genres as $genre_id) {
-                $conn->query("INSERT INTO book_genres (book_id, genre_id) VALUES ('$book_id', '$genre_id')");
-            }
-
-            echo '<script>alert("Book added successfully!")</script>';
+    if ($authorResult->num_rows > 0) {
+        // Author already exists, get the ID
+        $authorRow = $authorResult->fetch_assoc();
+        $authorId = $authorRow['id'];
+    } else {
+        // Author doesn't exist, create a new entry and get the ID
+        $createAuthorQuery = "INSERT INTO authors (name) VALUES ('$authorName')";
+        if ($conn->query($createAuthorQuery) === TRUE) {
+            $authorId = $conn->insert_id; // Get the ID of the newly inserted author
         } else {
-            echo "Error: " . $sql . "<br>" . $conn->error;
+            echo "Error creating author: " . $conn->error;
+            exit(); // Exit the script if there's an error
         }
     }
+
+    // Default image path
+    $image = $defaultImagePath;
+
+    // Handling image upload and resize
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+        $tmp_name = $_FILES['image']['tmp_name'];
+        $filename = basename($_FILES['image']['name']);
+        $uploadPath = $uploadDirectory . $filename; // Final uploaded image path
+        move_uploaded_file($tmp_name, $uploadPath);
+
+        // Resize uploaded image to 900x600
+        $resizedImagePath = $uploadDirectory . 'resized_' . $filename;
+        resizeImage($uploadPath, $resizedImagePath, 600, 900);
+
+        // Delete the original uploaded image
+        unlink($uploadPath);
+
+        $image = $resizedImagePath; // Use the resized image path
+    }
+
+    // Prepare and execute SQL query to insert data into 'books' table
+    $sql = "INSERT INTO books (title, description, price, image_url, date_published, date_added, author_id, publisher, isbn, pages, language) 
+            VALUES ('$title', '$description', '$price', '$image', '$date_published', NOW(), '$authorId', '$publisher', '$isbn', '$pages', '$language')";
+
+    if ($conn->query($sql) === TRUE) {
+        $book_id = $conn->insert_id; // Get the inserted book's ID
+
+        // Insert genres into the book_genres table
+        foreach ($genres as $genre_id) {
+            $conn->query("INSERT INTO book_genres (book_id, genre_id) VALUES ('$book_id', '$genre_id')");
+        }
+
+        echo '<script>alert("Book added successfully!")</script>';
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -202,6 +221,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #e0a800;
         }
     </style>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const authorInput = document.getElementById('author');
+        const authorList = document.getElementById('authorList');
+
+        authorInput.addEventListener('input', function () {
+            const inputValue = authorInput.value.trim();
+            if (inputValue.length === 0) {
+                authorList.innerHTML = ''; // Clear the suggestion list
+                return;
+            }
+
+            // Fetch suggestions from the database
+            fetch('getAuthors.php?name=' + inputValue)
+                .then(response => response.json())
+                .then(data => {
+                    authorList.innerHTML = ''; // Clear the suggestion list
+                    data.forEach(author => {
+                        const option = document.createElement('option');
+                        option.value = author.name;
+                        authorList.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching authors:', error));
+        });
+    });
+</script>
+
 </head>
 <body>
     <div class="container">
@@ -213,9 +260,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="text" id="title" name="title" required>
                 </div>
                 <div>
-                    <label for="author">Author:</label>
-                    <input type="text" id="author" name="author" required>
-                </div>
+        <label for="author">Author:</label>
+        <input type="text" id="author" name="author" list="authorList" required>
+        <datalist id="authorList"></datalist>
+    </div>
             </div>
             <div class="form-row">
                 <div>
@@ -242,6 +290,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <label for="date_published">Date Published:</label>
                     <input type="date" id="date_published" name="date_published" required>
                 </div>
+                <div class="form-row">
+    <div>
+        <label for="language">Language:</label>
+        <input type="text" id="language" name="language" required>
+    </div>
+</div>
+
                 <div>
                     <label for="image">Image:</label>
                     <input type="file" id="image" name="image" accept="image/*" required>
@@ -275,4 +330,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button class="add-genre-button" onclick="window.location.href='addGenre.php'">Add New Genre</button>
     </div>
 </body>
+
 </html>
