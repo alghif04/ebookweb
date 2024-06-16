@@ -28,7 +28,7 @@ if (isset($_GET['id'])) {
     }
 
     // Handle rating submission
-    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && !isset($_POST['delete_comment'])) {
         $rating = $_POST['rating'];
         $comment = $_POST['comment'];
         $userId = $_SESSION['user_id'];
@@ -44,8 +44,24 @@ if (isset($_GET['id'])) {
         }
     }
 
+    // Handle comment deletion
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_comment']) && isset($_SESSION['user_id'])) {
+        $commentId = $_POST['comment_id'];
+        $userId = $_SESSION['user_id'];
+        $isAdmin = $_SESSION['is_admin'];
+
+        // Check if the user is the owner of the comment or an admin
+        $sql = "DELETE FROM ratings WHERE id = ? AND (user_id = ? OR ? = 1)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("iii", $commentId, $userId, $isAdmin);
+        $stmt->execute();
+
+        header("Location: viewBook.php?id=$bookId");
+        exit();
+    }
+
     // Fetch existing ratings and comments
-    $sql = "SELECT r.rating, r.comment, r.created_at, u.username
+    $sql = "SELECT r.id, r.rating, r.comment, r.created_at, r.user_id, u.username
             FROM ratings r
             JOIN user_details u ON r.user_id = u.user_id
             WHERE r.book_id = ?
@@ -108,22 +124,22 @@ if (isset($_GET['id'])) {
     <title><?php echo htmlspecialchars($book['title']); ?></title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f0f0;
             margin: 0;
             padding: 0;
         }
         .container {
-            max-width: 800px;
-            margin: 20px auto;
+            max-width: 900px;
+            margin: 30px auto;
             padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
         }
         .book-header {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             margin-bottom: 20px;
         }
         .book-info {
@@ -134,45 +150,51 @@ if (isset($_GET['id'])) {
             padding-right: 20px;
         }
         .book-title {
-            font-size: 2em;
+            font-size: 2.5em;
             font-weight: bold;
+            color: #333;
             margin-bottom: 5px;
         }
         .author, .publish-info, .buttons {
             margin-bottom: 10px;
+            color: #555;
         }
         .author {
-            font-size: 1.2em;
+            font-size: 1.5em;
         }
         .publish-info {
-            font-size: 1em;
+            font-size: 1.1em;
         }
         .pages {
             display: inline-block;
             margin-left: 10px;
+            font-size: 0.9em;
+            color: #777;
         }
         .pages span {
             display: block;
         }
         .wishlist-button, .purchase-button {
             display: inline-block;
-            padding: 8px 16px;
+            padding: 10px 20px;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 5px;
             transition: background-color 0.3s ease;
-        }
-        .wishlist-button {
-            color: #333;
-            font-size: 14px;
-            border: 1px solid #ccc;
+            margin-right: 10px;
         }
         .purchase-button {
             background-color: #007bff;
-            color: #fff;
-            margin-right: 10px;
+            color: #ffffff;
+        }
+        .wishlist-button {
+            color: #333;
+            border: 1px solid #ccc;
+        }
+        .purchase-button:hover {
+            background-color: #0056b3;
         }
         .wishlist-button:hover {
-            background-color: #f5f5f5;
+            background-color: #e0e0e0;
         }
         .about-section {
             cursor: pointer;
@@ -181,15 +203,16 @@ if (isset($_GET['id'])) {
         }
         .description {
             margin-bottom: 20px;
+            color: #444;
         }
         .back-button {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #007bff;
-            color: #fff;
+            color: #ffffff;
             text-decoration: none;
-            border-radius: 4px;
+            border-radius: 5px;
             transition: background-color 0.3s ease;
         }
         .back-button:hover {
@@ -201,23 +224,28 @@ if (isset($_GET['id'])) {
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background-color: #fff;
+            background-color: #ffffff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
             max-width: 600px;
             width: 100%;
             z-index: 1000;
         }
         .popup h2 {
             margin-top: 0;
+            color: #333;
+        }
+        .popup p {
+            color: #444;
+        }
+        .popup hr {
+            margin: 10px 0;
         }
         .popup .close {
             cursor: pointer;
+            text-align: right;
             color: #007bff;
-        }
-        .popup .close:hover {
-            color: #0056b3;
         }
         .overlay {
             display: none;
@@ -227,49 +255,89 @@ if (isset($_GET['id'])) {
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
+            z-index: 500;
         }
         .rating-form {
-            margin-top: 20px;
-            border-top: 1px solid #ccc;
-            padding-top: 20px;
+            margin-top: 30px;
+            background-color: #f8f8f8;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-        .rating-form select, .rating-form textarea {
+        .rating-form h3 {
+            margin-top: 0;
+        }
+        .rating-form label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #555;
+        }
+        .rating-form .stars {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .rating-form .stars input {
+            display: none;
+        }
+        .rating-form .stars label {
+            font-size: 2em;
+            color: #ccc;
+            cursor: pointer;
+        }
+        .rating-form .stars input:checked ~ label,
+        .rating-form .stars input:hover ~ label,
+        .rating-form .stars input:checked ~ label ~ label,
+        .rating-form .stars input:hover ~ label ~ label {
+            color: #f39c12;
+        }
+        .rating-form textarea {
             width: 100%;
             padding: 10px;
-            margin-bottom: 10px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 5px;
         }
         .rating-form button {
-            background-color: #007bff;
-            color: #fff;
             padding: 10px 20px;
+            background-color: #007bff;
+            color: #ffffff;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
         .rating-form button:hover {
             background-color: #0056b3;
         }
         .ratings-list {
-            margin-top: 20px;
+            margin-top: 30px;
         }
-        .rating-item {
+        .ratings-list .rating-item {
             border-bottom: 1px solid #ccc;
             padding: 10px 0;
         }
-        .rating-item:last-child {
-            border-bottom: none;
-        }
-        .rating-item .rating {
+        .ratings-list .rating-item .rating {
             font-weight: bold;
+            color: #333;
         }
-        .rating-item .username {
-            color: #555;
+        .ratings-list .rating-item .username {
+            color: #777;
         }
-        .rating-item .comment {
+        .ratings-list .rating-item .comment {
             margin-top: 5px;
+            color: #444;
+        }
+        .ratings-list .rating-item .date {
+            font-size: 0.9em;
+            color: #999;
+        }
+        .ratings-list .rating-item .delete-button {
+            color: #e74c3c;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: inline-block;
         }
     </style>
 </head>
@@ -288,11 +356,18 @@ if (isset($_GET['id'])) {
             </div>
             <div class="buttons">
                 <a href="#" class="purchase-button">Purchase</a>
-                <a href="#" class="wishlist-button">Add to Wishlist</a>
+                <?php if (isset($_SESSION['user_id'])) { ?>
+                <form action="viewBook.php?id=<?php echo $bookId; ?>" method="POST" style="display: inline;">
+                    <input type="hidden" name="wishlist" value="1">
+                    <button type="submit" class="wishlist-button">Add to Wishlist</button>
+                </form>
+                <?php } else { ?>
+                <a href="login.php" class="wishlist-button">Add to Wishlist</a>
+                <?php } ?>
             </div>
         </div>
         <div class="book-image">
-        <img src="<?php echo $imageUrl; ?>" alt="<?php echo htmlspecialchars($book['title']); ?>">
+            <img src="<?php echo $imageUrl; ?>" alt="<?php echo htmlspecialchars($book['title']); ?>" width="240" height="345">
         </div>
     </div>
     <div class="about-section" onclick="showPopup()">
@@ -318,14 +393,18 @@ if (isset($_GET['id'])) {
         <h3>Rate this Book</h3>
         <form action="viewBook.php?id=<?php echo $bookId; ?>" method="POST">
             <label for="rating">Rating:</label>
-            <select name="rating" id="rating" required>
-                <option value="" disabled selected>Select your rating</option>
-                <option value="1">1 - Poor</option>
-                <option value="2">2 - Fair</option>
-                <option value="3">3 - Good</option>
-                <option value="4">4 - Very Good</option>
-                <option value="5">5 - Excellent</option>
-            </select>
+            <div class="stars">
+                <input type="radio" id="star5" name="rating" value="5" required>
+                <label for="star5">&#9733;</label>
+                <input type="radio" id="star4" name="rating" value="4">
+                <label for="star4">&#9733;</label>
+                <input type="radio" id="star3" name="rating" value="3">
+                <label for="star3">&#9733;</label>
+                <input type="radio" id="star2" name="rating" value="2">
+                <label for="star2">&#9733;</label>
+                <input type="radio" id="star1" name="rating" value="1">
+                <label for="star1">&#9733;</label>
+            </div>
             <label for="comment">Comment:</label>
             <textarea name="comment" id="comment" rows="4" required></textarea>
             <button type="submit">Submit</button>
@@ -335,18 +414,28 @@ if (isset($_GET['id'])) {
     <p>Please <a href="login.php">log in</a> to rate and comment on this book.</p>
     <?php } ?>
 
-    <!-- Ratings List -->
-    <div class="ratings-list">
-        <h3>User Ratings and Comments</h3>
-        <?php foreach ($ratings as $rating) { ?>
-        <div class="rating-item">
-            <div class="rating">Rating: <?php echo $rating['rating']; ?>/5</div>
-            <div class="username">By: <?php echo htmlspecialchars($rating['username']); ?></div>
-            <div class="comment"><?php echo htmlspecialchars($rating['comment']); ?></div>
-            <div class="date">Posted on: <?php echo date('F j, Y', strtotime($rating['created_at'])); ?></div>
-        </div>
+<!-- Ratings List -->
+<div class="ratings-list">
+    <h3>User Ratings and Comments</h3>
+    <?php foreach ($ratings as $rating) { ?>
+    <div class="rating-item">
+        <div class="rating">Rating: <?php echo $rating['rating']; ?>/5</div>
+        <div class="username">By: <?php echo htmlspecialchars($rating['username']); ?></div>
+        <div class="comment"><?php echo htmlspecialchars($rating['comment']); ?></div>
+        <div class="date">Posted on: <?php echo date('F j, Y', strtotime($rating['created_at'])); ?></div>
+        <?php if (isset($_SESSION['user_id']) && ($_SESSION['user_id'] == $rating['user_id'] || $_SESSION['is_admin'] == 1)) { ?>
+            <div class="delete-button">
+                <form action="viewBook.php?id=<?php echo $bookId; ?>" method="POST">
+                    <input type="hidden" name="comment_id" value="<?php echo $rating['id']; ?>">
+                    <input type="hidden" name="delete_comment" value="1">
+                    <button type="submit" class="delete-comment">Delete</button>
+                </form>
+            </div>
         <?php } ?>
     </div>
+    <?php } ?>
+</div>
+
 </div>
 
 <div class="overlay" onclick="hidePopup()"></div>
