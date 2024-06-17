@@ -103,11 +103,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         if ($user['is_admin'] == 1) {
                             $_SESSION['username'] = $username;
                             $_SESSION['user_id'] = $user['user_id'];
+                            $_SESSION['is_admin'] = $user['is_admin'];
                             header("Location: indexAdmin.php"); // Redirect admin to admin page
                             exit;
                         } else {
                             $_SESSION['username'] = $username;
                             $_SESSION['user_id'] = $user['user_id'];
+                            $_SESSION['is_admin'] = $user['is_admin'];
                             header("Location: indexLogin.php"); // Redirect regular user to regular page
                             exit;
                         }

@@ -6,7 +6,7 @@ session_start();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Readopolis</title>
+    <title>Readopolis - Admin</title>
     <style>
         * {
             margin: 0;
@@ -95,7 +95,7 @@ session_start();
             background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 5px;
-            width: 250px;
+            width: 200px;
             padding: 10px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
@@ -117,37 +117,6 @@ session_start();
 
         .product-item-content {
             flex: 1;
-        }
-
-        .product-preview {
-            position: absolute;
-            top: 10px;
-            left: 220px;
-            width: 300px;
-            height: 400px;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 10;
-            padding: 10px;
-        }
-
-        .product-preview h3,
-        .product-preview p,
-        .product-preview a {
-            margin-bottom: 10px;
-        }
-
-        .product-preview a {
-            display: block;
-            color: #007bff;
-            text-decoration: none;
-        }
-
-        .product-preview a:hover {
-            text-decoration: underline;
         }
 
         .wishlist-button {
@@ -207,8 +176,9 @@ session_start();
         }
     </style>
 </head>
+<body>
 <?php include 'header.php'; ?>
-    <?php include 'sidebar.php'; ?>
+<?php include 'sidebar.php'; ?>
     <div class="main-content">
         <div class="search">
             <input type="text" id="searchInput" placeholder="Search by title or author">
@@ -245,7 +215,7 @@ session_start();
 
             // Generate HTML for each book
             foreach ($books as $book) {
-                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-price="$' . $book['price'] . '" data-url="checkout' . $book['id'] . '.html" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
+                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="viewBook.php?id=' . $book['id'] . '" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
                 echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
                 echo '<div class="product-item-content">';
                 echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
@@ -256,11 +226,6 @@ session_start();
                 echo '</div>';
             }
             ?>
-        </div>
-        <div class="product-preview" id="product-preview">
-            <h3 id="preview-title">Product Title</h3>
-            <p id="preview-description">Product description will appear here when you hover over a product.</p>
-            <a id="preview-price" href="#" target="_blank">Price</a>
         </div>
     </div>
     <script>
@@ -275,97 +240,82 @@ document.querySelectorAll('.product-item').forEach(item => {
 
         wishlistButton.disabled = true; // Disable the button immediately after click
     });
-});
 
-function addToWishlist(id, buttonElement) {
-    console.log('Adding book to wishlist with ID:', id);
-
-    // Disable the button to prevent multiple clicks
-    buttonElement.disabled = true;
-
-    <?php if (isset($_SESSION['username'])) { ?>
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "wishlist_handler.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            if (response.status === 'success') {
-                alert('Book added to wishlist');
-            } else {
-                alert(response.message);
-            }
-            buttonElement.disabled = false; // Re-enable the button after handling the response
+    item.addEventListener('click', function (event) {
+        if (!event.target.classList.contains('wishlist-button')) { // Exclude wishlist button clicks
+            const url = this.getAttribute('data-url');
+            window.location.href = url;
         }
-    };
-
-    xhr.send(`book_id=${id}`);
-    <?php } else { ?>
-    openPopup(event);
-    <?php } ?>
-}
-
-
-
-document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
-    const productCatalog = document.querySelector('.product-catalog');
-
-    function filterProducts(searchTerm) {
-        const products = Array.from(productCatalog.children);
-
-        products.forEach(product => {
-            const title = product.getAttribute('data-title').toLowerCase();
-            const description = product.getAttribute('data-description').toLowerCase();
-
-            if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                product.style.display = 'block';
-            } else {
-                product.style.display = 'none';
-            }
-        });
-    }
-    searchInput.addEventListener('input', function () {
-        const searchTerm = this.value.trim().toLowerCase();
-        filterProducts(searchTerm);
     });
 });
 
+document.querySelectorAll('.sort-box a').forEach(sortLink => {
+    sortLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        const sortType = this.getAttribute('id').replace('sort-', '');
+        sortProductItems(sortType);
+    });
+});
+
+function addToWishlist(id, button) {
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', 'addWishlist.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function () {
+        if (xhr.status === 200) {
+            alert('Book added to wishlist successfully!');
+            button.disabled = true; // Disable the button after successful addition
+        } else {
+            alert('Error adding book to wishlist. Please try again.');
+        }
+    };
+    xhr.send('bookId=' + id);
+}
 
 function deleteBook(bookId) {
     if (confirm('Are you sure you want to delete this book?')) {
         const xhr = new XMLHttpRequest();
-        xhr.open("POST", "deleteBook.php", true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                console.log(xhr.responseText); // Log the response for debugging
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    if (response.status === 'success') {
-                        alert('Book deleted successfully');
-                        // Reload the page or update the book list
-                        location.reload(); // You can also update the book list without reloading the page
-                    } else {
-                        alert(response.message);
-                    }
-                } catch (error) {
-                    console.error('Error parsing JSON:', error);
-                }
+        xhr.open('POST', 'deleteBook.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                alert('Book deleted successfully!');
+                document.querySelector(`.product-item[data-id='${bookId}']`).remove();
+            } else {
+                alert('Error deleting book. Please try again.');
             }
         };
-
-        xhr.send(`book_id=${bookId}`);
+        xhr.send('bookId=' + bookId);
     }
 }
 
+function sortProductItems(sortType) {
+    const container = document.querySelector('.product-catalog');
+    const items = Array.from(container.children);
 
+    items.sort((a, b) => {
+        let aValue, bValue;
+        if (sortType === 'title') {
+            aValue = a.getAttribute('data-title').toLowerCase();
+            bValue = b.getAttribute('data-title').toLowerCase();
+        } else if (sortType === 'date-published') {
+            aValue = new Date(a.getAttribute('data-date-published'));
+            bValue = new Date(b.getAttribute('data-date-published'));
+        } else if (sortType === 'date-added') {
+            aValue = new Date(a.getAttribute('data-date-added'));
+            bValue = new Date(b.getAttribute('data-date-added'));
+        }
+        if (aValue < bValue) {
+            return -1;
+        }
+        if (aValue > bValue) {
+            return 1;
+        }
+        return 0;
+    });
 
-
-
-
+    items.forEach(item => container.appendChild(item));
+}
     </script>
 </body>
 </html>
