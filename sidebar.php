@@ -392,7 +392,7 @@
     </div>
 
     <div class="footer">
-        <span>Readopolis, made by group 8 of web development class</span>
+        <span>Readopolis, made by group 9 of web development class</span>
     </div>
 
 <script>
