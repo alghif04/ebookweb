@@ -6,34 +6,34 @@
     <title>Readopolis</title>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        *{
+        * {
             margin: 0;
             padding: 0;
-            box-sizing:  border-box;
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        .sidebar{
+        .sidebar {
             position: absolute;
-            top : 0;
-            left : 0;
+            top: 0;
+            left: 0;
             height: 100vh;
             width: 80px;
             background-color: #2F2D2D;
             padding: .4rem .8rem;
-            transition:  all 0.5s ease;
+            transition: all 0.5s ease;
         }
 
-        .sidebar.active ~ .main-content{
+        .sidebar.active ~ .main-content {
             left: 250px;
             width: calc(100% - 250px);
         }
 
-        .sidebar.active{
+        .sidebar.active {
             width: 250px;
         }
 
-        .sidebar #btn{
+        .sidebar #btn {
             position: absolute;
             color: #fff;
             top: .4rem;
@@ -44,13 +44,13 @@
             cursor: pointer;
         }
 
-        .sidebar.active #btn{
-            left: 90%
+        .sidebar.active #btn {
+            left: 90%;
         }
 
         .sidebar .top .logo {
-            color : #fff;
-            display:flex;
+            color: #fff;
+            display: flex;
             height: 50px;
             width: 100%;
             align-items: center;
@@ -58,7 +58,7 @@
             opacity: 0;
         }
 
-        .sidebar.active .top .logo{
+        .sidebar.active .top .logo {
             opacity: 1;
         }
 
@@ -67,15 +67,15 @@
             margin-right: 5px;
         }
 
-        .sidebar p{
+        .sidebar p {
             opacity: 0;
         }
 
-        .sidebar.active p{
+        .sidebar.active p {
             opacity: 1;
         }
 
-        .sidebar ul li{
+        .sidebar ul li {
             position: relative;
             list-style-type: none;
             height: 50px;
@@ -84,12 +84,13 @@
             line-height: 50px;
         }
 
-        .sidebar ul li a{
+        .sidebar ul li a {
             color: #fff;
             display: flex;
             align-items: center;
             text-decoration: none;
             border-radius: 0.8rem;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         .sidebar ul li a:hover {
@@ -115,30 +116,33 @@
 
         .sidebar ul li .tooltip {
             position: absolute;
-            left: 125px;
-            top:50%;
-            transform:translate(-50%, -50%);
-            box-shadow: 0 0.5rem 0.8rem rgba(0, 0, 0, 0.2);
-            border-radius: .6rem;
-            padding: .4rem 1.2rem;
-            line-height: 1.8rem;
-            z-index: 20;
+            left: 100%;
+            top: 50%;
+            transform: translate(10px, -50%);
+            background-color: #2F2D2D;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
             opacity: 0;
+            white-space: nowrap;
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
 
         .sidebar ul li a:hover + .tooltip {
-        opacity: 1;
+            opacity: 1;
+            transform: translate(15px, -50%);
         }
 
-
-        .sidebar.sidebar.active ul li .tooltip{
+        .sidebar.sidebar.active ul li .tooltip {
             display: none;
         }
 
         .username {
-            font-size: 0.8em; 
-            display: block; 
-            margin-top: -30px; 
+            font-size: 0.8em;
+            display: block;
+            margin-top: -30px;
             color: #a49a9a;
         }
     </style>
@@ -155,22 +159,32 @@
         </div>
         <ul>
             <li>
-                <a href="#">
-                    <i class='bx bxs-book' ></i>
+                <a href="<?php 
+                    if (!isset($_SESSION['username'])) {
+                        echo 'index.php';
+                    } else {
+                        if ($_SESSION['is_admin'] == 1) {
+                            echo 'indexAdmin.php';
+                        } else {
+                            echo 'indexLogin.php';
+                        }
+                    }
+                ?>">
+                    <i class='bx bxs-book'></i>
                     <span class="nav-item">Books</span>
                 </a>
                 <span class="tooltip">Books</span>
             </li>
             <li>
-                <a href="<?php echo isset($_SESSION['username']) ? 'wishlist.php' /* Redirect ke page ini ketika sudah login */ : '#'; ?>" <?php echo !isset($_SESSION['username']) ? 'onclick="openPopup(event)"' : ''; ?>>
-                    <i class='bx bx-list-ul' ></i>
+                <a href="<?php echo isset($_SESSION['username']) ? 'wishlist.php' : '#'; ?>" <?php echo !isset($_SESSION['username']) ? 'onclick="openPopup(event)"' : ''; ?>>
+                    <i class='bx bx-list-ul'></i>
                     <span class="nav-item">Wishlist</span>
                 </a>
                 <span class="tooltip">Wishlist</span>
             </li>
             <li>
                 <a href="#" onclick="openAbout(event)">
-                    <i class='bx bx-info-circle' ></i>
+                    <i class='bx bx-info-circle'></i>
                     <span class="nav-item">About</span>
                 </a>
                 <span class="tooltip">About</span>
@@ -185,7 +199,7 @@
             <li>
                 <?php if (isset($_SESSION['username'])): ?>
                     <a href="logout.php">
-                        <i class='bx bx-log-out' ></i>
+                        <i class='bx bx-log-out'></i>
                         <span class="nav-item">
                             Logout
                             <span class="username"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
@@ -194,7 +208,7 @@
                     <span class="tooltip">Logout</span>
                 <?php else: ?>
                     <a href="Login.php">
-                        <i class='bx bx-log-in' ></i>
+                        <i class='bx bx-log-in'></i>
                         <span class="nav-item">Login</span>
                     </a>
                     <span class="tooltip">Login</span>
@@ -202,16 +216,14 @@
             </li>
         </ul>
     </div>
-
-
 </body>
 
 <script>
-    let btn = document.querySelector('#btn')
-    let sidebar = document.querySelector('.sidebar')
+    let btn = document.querySelector('#btn');
+    let sidebar = document.querySelector('.sidebar');
 
-    btn.onclick = function (){
-        sidebar.classList.toggle('active')
+    btn.onclick = function() {
+        sidebar.classList.toggle('active');
     }
 </script>
 

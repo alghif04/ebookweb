@@ -1,7 +1,5 @@
 <?php
 session_start();
-var_dump($_SESSION);
-
 require 'dbconn.php';
 
 // Check if the book_id parameter is set in the URL
