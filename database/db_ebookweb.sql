@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 16, 2024 at 04:38 PM
+-- Generation Time: Jun 17, 2024 at 11:32 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -112,6 +112,28 @@ INSERT INTO `genres` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `payment_options`
+--
+
+CREATE TABLE `payment_options` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `card_number` varchar(16) NOT NULL,
+  `expiration_date` date NOT NULL,
+  `cvv` int(11) NOT NULL,
+  `billing_address` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payment_options`
+--
+
+INSERT INTO `payment_options` (`id`, `user_id`, `card_number`, `expiration_date`, `cvv`, `billing_address`) VALUES
+(3, 5, '1', '2024-06-19', 2233, '12222');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `ratings`
 --
 
@@ -134,6 +156,29 @@ INSERT INTO `ratings` (`id`, `book_id`, `user_id`, `rating`, `comment`, `created
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `user_cards`
+--
+
+CREATE TABLE `user_cards` (
+  `card_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `card_number` varchar(16) NOT NULL,
+  `expiration_date` date NOT NULL,
+  `cvv` varchar(4) NOT NULL,
+  `billing_address` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_cards`
+--
+
+INSERT INTO `user_cards` (`card_id`, `user_id`, `card_number`, `expiration_date`, `cvv`, `billing_address`, `created_at`) VALUES
+(2, 5, '1111', '2024-06-05', '223', '2333', '2024-06-17 07:46:25');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `user_details`
 --
 
@@ -142,16 +187,18 @@ CREATE TABLE `user_details` (
   `username` text NOT NULL,
   `email` text NOT NULL,
   `password` text NOT NULL,
-  `is_admin` int(11) DEFAULT 0
+  `is_admin` int(11) DEFAULT 0,
+  `display_name` varchar(255) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user_details`
 --
 
-INSERT INTO `user_details` (`user_id`, `username`, `email`, `password`, `is_admin`) VALUES
-(3, 'robin', 'robin123@gmail.com', '$2y$10$BesDSL2euap.ppCCRRwUTOu4WNDQUKLsjaVYJxQcmvGGK0EKiX406', 0),
-(4, 'tunguska', 'tunguska@gmail.com', '$2y$10$N2gM3/qo4KhoVgMC9XnLquc9RuwODq37z0.xxbkJt2IfbT26j46Ii', 1);
+INSERT INTO `user_details` (`user_id`, `username`, `email`, `password`, `is_admin`, `display_name`) VALUES
+(3, 'robin', 'robin123@gmail.com', '$2y$10$BesDSL2euap.ppCCRRwUTOu4WNDQUKLsjaVYJxQcmvGGK0EKiX406', 0, ''),
+(4, 'tunguska', 'tunguska@gmail.com', '$2y$10$N2gM3/qo4KhoVgMC9XnLquc9RuwODq37z0.xxbkJt2IfbT26j46Ii', 1, ''),
+(5, 'batman', 'batman@gmail.com', '$2y$10$5SwukimMy7BqJ2SfJkRHE.Pfb9tta9iynFThjRGQaD8k0/pEGsTHW', 0, 'alfred');
 
 -- --------------------------------------------------------
 
@@ -172,7 +219,9 @@ CREATE TABLE `wishlist` (
 
 INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
 (64, 3, 28, '2024-06-16 05:17:37'),
-(65, 3, 30, '2024-06-16 10:31:04');
+(65, 3, 30, '2024-06-16 10:31:04'),
+(67, 5, NULL, '2024-06-17 08:24:48'),
+(68, 5, NULL, '2024-06-17 08:24:55');
 
 --
 -- Indexes for dumped tables
@@ -206,11 +255,25 @@ ALTER TABLE `genres`
   ADD UNIQUE KEY `name` (`name`);
 
 --
+-- Indexes for table `payment_options`
+--
+ALTER TABLE `payment_options`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `ratings`
 --
 ALTER TABLE `ratings`
   ADD PRIMARY KEY (`id`),
   ADD KEY `book_id` (`book_id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `user_cards`
+--
+ALTER TABLE `user_cards`
+  ADD PRIMARY KEY (`card_id`),
   ADD KEY `user_id` (`user_id`);
 
 --
@@ -250,22 +313,34 @@ ALTER TABLE `genres`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `payment_options`
+--
+ALTER TABLE `payment_options`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+
+--
+-- AUTO_INCREMENT for table `user_cards`
+--
+ALTER TABLE `user_cards`
+  MODIFY `card_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `user_details`
 --
 ALTER TABLE `user_details`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- Constraints for dumped tables
@@ -285,11 +360,23 @@ ALTER TABLE `book_genres`
   ADD CONSTRAINT `book_genres_ibfk_2` FOREIGN KEY (`genre_id`) REFERENCES `genres` (`id`) ON DELETE CASCADE;
 
 --
+-- Constraints for table `payment_options`
+--
+ALTER TABLE `payment_options`
+  ADD CONSTRAINT `payment_options_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_details` (`user_id`);
+
+--
 -- Constraints for table `ratings`
 --
 ALTER TABLE `ratings`
   ADD CONSTRAINT `ratings_ibfk_1` FOREIGN KEY (`book_id`) REFERENCES `books` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `ratings_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `user_details` (`user_id`);
+
+--
+-- Constraints for table `user_cards`
+--
+ALTER TABLE `user_cards`
+  ADD CONSTRAINT `user_cards_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_details` (`user_id`);
 
 --
 -- Constraints for table `wishlist`
