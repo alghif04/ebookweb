@@ -357,7 +357,7 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
             <div class="buttons">
-                <a href="#" class="purchase-button">Purchase</a>
+            <a href="#" class="purchase-button" onclick="showCardSelection()">Purchase</a>
                 <?php if (isset($_SESSION['user_id'])) { ?>
                 <form action="viewBook.php?id=<?php echo $bookId; ?>" method="POST" style="display: inline;">
                     <input type="hidden" name="wishlist" value="1">
@@ -454,6 +454,27 @@ if (isset($_GET['id'])) {
     <p><strong>Pages:</strong> <?php echo $book['pages']; ?></p>
     <div class="close" onclick="hidePopup()">Close</div>
 </div>
+<!-- Card Selection Popup -->
+<div class="popup" id="cardSelectionPopup" style="display: none;">
+    <h2>Select Card for Purchase</h2>
+    <?php if (!empty($_SESSION['user_cards'])) { ?>
+        <form action="purchase.php" method="POST">
+            <label for="card">Select Card:</label>
+            <select name="card" id="card" required>
+                <?php foreach ($_SESSION['user_cards'] as $card) { ?>
+                    <option value="<?php echo $card['card_id']; ?>">
+                        Card ending with <?php echo substr($card['card_number'], -4); ?>
+                    </option>
+                <?php } ?>
+            </select>
+            <button type="submit">Proceed to Purchase</button>
+        </form>
+    <?php } else { ?>
+        <p>Please setup your card first.</p>
+    <?php } ?>
+    <div class="close" onclick="hideCardSelection()">Close</div>
+</div>
+
 
 <script>
 function showPopup() {
@@ -463,6 +484,61 @@ function showPopup() {
 
 function hidePopup() {
     document.getElementById('popup').style.display = 'none';
+    document.querySelector('.overlay').style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const wishlistButton = document.querySelector('.wishlist-button');
+
+    wishlistButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const bookId = <?php echo $bookId; ?>;
+
+        // Simulate adding to wishlist
+        addToWishlist(bookId, wishlistButton);
+        wishlistButton.disabled = true;
+    });
+});
+
+function addToWishlist(bookId, buttonElement) {
+    console.log('Adding book to wishlist with ID:', bookId);
+
+    // Disable the button to prevent multiple clicks
+    buttonElement.disabled = true;
+
+    <?php if (isset($_SESSION['username'])) { ?>
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "wishlist_handler.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.status === 'success') {
+                alert('Book added to wishlist');
+            } else {
+                alert(response.message);
+            }
+            buttonElement.disabled = false;
+        }
+    };
+
+    xhr.send(`book_id=${bookId}`);
+    <?php } else { ?>
+    // Display a message or open a popup for non-logged-in users
+    alert('Please log in to add this book to your wishlist.');
+    <?php } ?>
+}
+
+function showCardSelection() {
+    document.getElementById('cardSelectionPopup').style.display = 'block';
+    document.querySelector('.overlay').style.display = 'block';
+}
+
+function hideCardSelection() {
+    document.getElementById('cardSelectionPopup').style.display = 'none';
     document.querySelector('.overlay').style.display = 'none';
 }
 </script>

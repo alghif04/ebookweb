@@ -79,13 +79,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 echo '<script> alert ("Please enter an email")</script>';
             } else {
                 $hash = password_hash($password, PASSWORD_DEFAULT);
-                $sql = "INSERT INTO user_details (username, email, password) VALUES ('$username', '$email', '$hash')";
+
+                // Set the initial display name to be the same as username
+                $display_name = $username;
+
+                // Insert user details into the database with display name
+                $sql = "INSERT INTO user_details (username, email, password, display_name) VALUES ('$username', '$email', '$hash', '$display_name')";
                 if (mysqli_query($conn, $sql)) {
                     echo '<script>alert("You are now registered!")</script>'; ;
                 } else {
                     echo "Error: " . $sql . "<br>" . mysqli_error($conn);
                 }
             }
+    
+
         } elseif ($_POST['form_type'] == "login") {
             // Form login
             $username = filter_input(INPUT_POST, "login-username", FILTER_SANITIZE_SPECIAL_CHARS);
@@ -94,22 +101,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (empty($username) || empty($password)) {
                 echo '<script>alert("Please enter both username and password.")</script>';
             } else {
-                $sql = "SELECT * FROM user_details WHERE username = '$username'";
-                $result = mysqli_query($conn, $sql);
-
-                if (mysqli_num_rows($result) == 1) {
-                    $user = mysqli_fetch_assoc($result);
+                $sql = "SELECT * FROM user_details WHERE username = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("s", $username);
+                $stmt->execute();
+                $result = $stmt->get_result();
+            
+                if ($result->num_rows == 1) {
+                    $user = $result->fetch_assoc();
                     if (password_verify($password, $user['password'])) {
+                        $_SESSION['username'] = $username;
+                        $_SESSION['user_id'] = $user['user_id'];
+                        $_SESSION['is_admin'] = $user['is_admin'];
+                        $_SESSION['display_name'] = $user['display_name'];
+            
+                        // Fetch and set user's cards in session
+                        $userId = $user['user_id'];
+                        $sqlCards = "SELECT * FROM user_cards WHERE user_id = ?";
+                        $stmtCards = $conn->prepare($sqlCards);
+                        $stmtCards->bind_param("i", $userId);
+                        $stmtCards->execute();
+                        $resultCards = $stmtCards->get_result();
+            
+                        if ($resultCards->num_rows > 0) {
+                            $userCards = [];
+                            while ($card = $resultCards->fetch_assoc()) {
+                                $userCards[] = $card;
+                            }
+                            $_SESSION['user_cards'] = $userCards;
+                        }
+            
+                        // Redirect based on user type
                         if ($user['is_admin'] == 1) {
-                            $_SESSION['username'] = $username;
-                            $_SESSION['user_id'] = $user['user_id'];
-                            $_SESSION['is_admin'] = $user['is_admin'];
                             header("Location: indexAdmin.php"); // Redirect admin to admin page
                             exit;
                         } else {
-                            $_SESSION['username'] = $username;
-                            $_SESSION['user_id'] = $user['user_id'];
-                            $_SESSION['is_admin'] = $user['is_admin'];
                             header("Location: indexLogin.php"); // Redirect regular user to regular page
                             exit;
                         }
@@ -120,6 +146,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     echo '<script>alert("Username not found.")</script>';
                 }
             }
+            
         }
     }
 }
