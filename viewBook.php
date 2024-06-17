@@ -26,6 +26,7 @@ if (isset($_GET['id'])) {
         header("Location: index.php");
         exit();
     }
+    
 
     // Handle rating submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && !isset($_POST['delete_comment'])) {
@@ -458,7 +459,7 @@ if (isset($_GET['id'])) {
 <div class="popup" id="cardSelectionPopup" style="display: none;">
     <h2>Select Card for Purchase</h2>
     <?php if (!empty($_SESSION['user_cards'])) { ?>
-        <form action="purchase.php" method="POST">
+        <form action="purchase.php?book_id=<?php echo $book['id']; ?>" method="POST">
             <label for="card">Select Card:</label>
             <select name="card" id="card" required>
                 <?php foreach ($_SESSION['user_cards'] as $card) { ?>
@@ -474,6 +475,7 @@ if (isset($_GET['id'])) {
     <?php } ?>
     <div class="close" onclick="hideCardSelection()">Close</div>
 </div>
+
 
 
 <script>

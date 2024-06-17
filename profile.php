@@ -35,7 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $_POST
     $stmtUpdateProfile = $conn->prepare($sqlUpdateProfile);
     $stmtUpdateProfile->bind_param("si", $newDisplayName, $userID);
     $stmtUpdateProfile->execute();
-    $_SESSION['display_name'] = $newDisplayName;
 
     // Check if adding a new card
     if (isset($_POST['add_card'])) {
@@ -50,6 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $_POST
             $stmtInsertCard = $conn->prepare($sqlInsertCard);
             $stmtInsertCard->bind_param("issis", $userID, $cardNumber, $expirationDate, $cvv, $billingAddress);
             $stmtInsertCard->execute();
+            updateSessionUserCards($conn, $userID);
+            
         } else {
             echo '<script> alert ("You have reached the maximum limit of 3 cards")</script>';
         }
@@ -64,6 +65,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['form_type']) && $_POST
         $stmtDeleteCard = $conn->prepare($sqlDeleteCard);
         $stmtDeleteCard->bind_param("ii", $cardID, $userID);
         $stmtDeleteCard->execute();
+        unset($_SESSION['user_cards'][$cardIndexToRemove]);
+        updateSessionUserCards($conn, $userID);
     }
 
     // Redirect to profile.php after processing form data
@@ -81,7 +84,22 @@ function countUserCards($conn, $userID) {
     $row = $resultCountCards->fetch_assoc();
     return $row['card_count'];
 }
+function updateSessionUserCards($conn, $userID) {
+    $sqlGetCards = "SELECT * FROM user_cards WHERE user_id = ?";
+    $stmtGetCards = $conn->prepare($sqlGetCards);
+    $stmtGetCards->bind_param("i", $userID);
+    $stmtGetCards->execute();
+    $resultCards = $stmtGetCards->get_result();
 
+    $userCards = [];
+    if ($resultCards->num_rows > 0) {
+        while ($row = $resultCards->fetch_assoc()) {
+            $userCards[] = $row;
+        }
+    }
+
+    $_SESSION['user_cards'] = $userCards;
+}
 // Retrieve user's card information from the database
 $sqlGetCards = "SELECT * FROM user_cards WHERE user_id = ?";
 $stmtGetCards = $conn->prepare($sqlGetCards);
@@ -107,67 +125,136 @@ if ($resultCards->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile</title>
     <style>
-        /* Your CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2, h3 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            text-align: center;
+        }
+        form label {
+            display: block;
+            margin-bottom: 5px;
+            text-align: left;
+        }
+        form input[type="text"], form input[type="date"], form textarea, form button, form input[type="submit"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+        .cards-container ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: center;
+        }
+        .cards-container ul li {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            display: inline-block;
+        }
+        .cards-container ul li form {
+            display: inline;
+        }
+        .cards-container ul li form input[type="submit"] {
+            background-color: #dc3545;
+        }
+        .cards-container ul li form input[type="submit"]:hover {
+            background-color: #bd2130;
+        }
     </style>
 </head>
 <body>
-    <h1>Welcome, <?php echo $username; ?>!</h1>
-    <h2>Profile Information</h2>
-    <form action="profile.php" method="POST">
-    <input type="hidden" name="form_type" value="update_profile">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" value="<?php echo $username; ?>" disabled><br><br>
-    <label for="email">Email:</label>
-    <input type="text" id="email" name="email" value="<?php echo $email; ?>" disabled><br><br>
-    <label for="display_name">Display Name:</label>
-    <input type="text" id="display_name" name="display_name" value="<?php echo $displayName; ?>"><br><br>
-    <button type="submit">Update Display Name</button>
-    </form>
-
-    <!-- Add Card Button -->
-    <?php if (countUserCards($conn, $userID) < 3) { ?>
-    <button type="button" onclick="showAddCardForm()">+ Add Card for Payment</button>
-    <?php } else {
-        echo '<span style="color: red;">Maximum limit of 3 cards reached</span>';
-    } ?>
-
-    <!-- Add Card Form (Initially Hidden) -->
-    <div id="addCardForm" style="display: none;">
-        <label for="card_number">Card Number:</label>
-        <input type="text" id="card_number" name="card_number" required><br><br>
-        <label for="expiration_date">Expiration Date:</label>
-        <input type="date" id="expiration_date" name="expiration_date" required><br><br>
-        <label for="cvv">CVV:</label>
-        <input type="text" id="cvv" name="cvv" required><br><br>
-        <label for="billing_address">Billing Address:</label>
-        <textarea id="billing_address" name="billing_address" required></textarea><br><br>
-        <input type="hidden" name="add_card" value="1">
-        <input type="submit" value="Submit Card">
+<?php include 'sidebar.php'; ?>
+    <div class="container">
+        <h1>Welcome, <?php echo $username; ?>!</h1>
+        <h2>Profile Information</h2>
+        <form action="profile.php" method="POST">
+            <input type="hidden" name="form_type" value="update_profile">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="<?php echo $username; ?>" disabled>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" value="<?php echo $email; ?>" disabled>
+            <div class="button-container">
+                <!-- Add Card Button -->
+                <?php if (countUserCards($conn, $userID) < 3) { ?>
+                    <button type="button" onclick="showAddCardForm()">+ Add Card for Payment</button>
+                <?php } else {
+                    echo '<span style="color: red;">Maximum limit of 3 cards reached</span>';
+                } ?>
+            </div>
+            <!-- Add Card Form (Initially Hidden) -->
+            <div id="addCardForm" style="display: none;">
+                <label for="card_number">Card Number:</label>
+                <input type="text" id="card_number" name="card_number" required>
+                <label for="expiration_date">Expiration Date:</label>
+                <input type="date" id="expiration_date" name="expiration_date" required>
+                <label for="cvv">CVV:</label>
+                <input type="text" id="cvv" name="cvv" required>
+                <label for="billing_address">Billing Address:</label>
+                <textarea id="billing_address" name="billing_address" required></textarea>
+                <input type="hidden" name="add_card" value="1">
+                <input type="submit" value="Submit Card">
+            </div>
+        </form>
+        <!-- Display User's Cards -->
+        <div class="cards-container">
+            <?php if (!empty($userCards)) { ?>
+                <h3>Your Cards:</h3>
+                <ul>
+                    <?php foreach ($userCards as $card) { ?>
+                        <li>
+                            Card Number: <?php echo $card['card_number']; ?><br>
+                            Expiration Date: <?php echo $card['expiration_date']; ?><br>
+                            CVV: <?php echo $card['cvv']; ?><br>
+                            Billing Address: <?php echo $card['billing_address']; ?><br>
+                            <form action="profile.php" method="POST">
+                                <input type="hidden" name="form_type" value="update_profile">
+                                <input type="hidden" name="card_id" value="<?php echo $card['card_id']; ?>">
+                                <input type="hidden" name="delete_card" value="1">
+                                <input type="submit" value="Delete Card">
+                            </form>
+                        </li>
+                    <?php } ?>
+                </ul>
+            <?php } ?>
+        </div>
     </div>
-</form>
-
-
-<!-- Display User's Cards -->
-<?php if (!empty($userCards)) { ?>
-    <h3>Your Cards:</h3>
-    <ul>
-        <?php foreach ($userCards as $card) { ?>
-            <li>
-                Card Number: <?php echo $card['card_number']; ?><br>
-                Expiration Date: <?php echo $card['expiration_date']; ?><br>
-                CVV: <?php echo $card['cvv']; ?><br>
-                Billing Address: <?php echo $card['billing_address']; ?><br>
-                <form action="profile.php" method="POST">
-                    <input type="hidden" name="form_type" value="update_profile">
-                    <input type="hidden" name="card_id" value="<?php echo $card['card_id']; ?>">
-                    <input type="hidden" name="delete_card" value="1">
-                    <input type="submit" value="Delete Card">
-                </form>
-            </li>
-        <?php } ?>
-    </ul>
-<?php } ?>
-
 
 
 <script>

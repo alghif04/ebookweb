@@ -347,6 +347,16 @@
                 </a>
                 <span class="tooltip">Books</span>
             </li>
+            <?php if (isset($_SESSION['username'])): ?>
+                <!-- Add Library section only if the user is logged in -->
+                <li>
+                    <a href="library.php">
+                        <i class='bx bx-library'></i>
+                        <span class="nav-item">Library</span>
+                    </a>
+                    <span class="tooltip">Library</span>
+                </li>
+            <?php endif; ?>
             <li>
                 <a href="<?php echo isset($_SESSION['username']) ? 'wishlist.php' : '#'; ?>" <?php echo !isset($_SESSION['username']) ? 'onclick="openPopup(event)"' : ''; ?>>
                     <i class='bx bx-list-ul'></i>

@@ -4,13 +4,18 @@ include 'dbconn.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['book_id'])) {
     $bookId = $_POST['book_id'];
 
-    // Get image URL before deleting the book
-    $getImageUrlQuery = "SELECT image_url FROM books WHERE id = $bookId";
-    $imageResult = $conn->query($getImageUrlQuery);
-    if ($imageResult->num_rows > 0) {
-        $row = $imageResult->fetch_assoc();
+    // Get image URL and PDF URL before deleting the book
+    $getUrlsQuery = "SELECT image_url, pdf_url FROM books WHERE id = $bookId";
+    $urlsResult = $conn->query($getUrlsQuery);
+    if ($urlsResult->num_rows > 0) {
+        $row = $urlsResult->fetch_assoc();
         $imageUrl = $row['image_url'];
-        
+        $pdfUrl = $row['pdf_url'];
+
+        // Debugging output
+        echo "Image URL: $imageUrl<br>";
+        echo "PDF URL: $pdfUrl<br>";
+
         // Delete book from books table
         $deleteBookQuery = "DELETE FROM books WHERE id = $bookId";
         if ($conn->query($deleteBookQuery) === TRUE) {
@@ -21,10 +26,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['book_id'])) {
             // Delete image file from uploads folder and resized image if it exists
             if (file_exists($imageUrl)) {
                 unlink($imageUrl);
+                echo "Image file deleted<br>";
             }
             $resizedImageUrl = 'uploads/resized_' . basename($imageUrl);
             if (file_exists($resizedImageUrl)) {
                 unlink($resizedImageUrl);
+                echo "Resized image file deleted<br>";
+            }
+
+            // Delete PDF file if it exists
+            if (file_exists($pdfUrl)) {
+                unlink($pdfUrl);
+                echo "PDF file deleted<br>";
             }
 
             echo json_encode(['status' => 'success', 'message' => 'Book deleted successfully.']);

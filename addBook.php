@@ -94,9 +94,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $image = $resizedImagePath; // Use the resized image path
     }
 
+    // Handling PDF upload
+if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
+    $pdfTmpName = $_FILES['pdf']['tmp_name'];
+    $pdfFilename = $_FILES['pdf']['name'];
+    $pdfExtension = pathinfo($pdfFilename, PATHINFO_EXTENSION);
+    $pdfNewName = $title . '.' . $pdfExtension; // Rename PDF file to book title
+
+    // Define the directory to upload PDF files
+    $pdfDirectory = 'pdf_files/';
+    $pdfUploadPath = $pdfDirectory . $pdfNewName;
+
+    // Move the uploaded PDF file to the specified directory with the new name
+    if (move_uploaded_file($pdfTmpName, $pdfUploadPath)) {
+        // Update the PDF URL in the database
+        $pdfUrl = $pdfUploadPath;
+    } else {
+        echo "Error moving PDF file to destination.";
+        exit();
+    }
+} else {
+    echo "Error uploading PDF file.";
+    exit();
+}
+
     // Prepare and execute SQL query to insert data into 'books' table
-    $sql = "INSERT INTO books (title, description, price, image_url, date_published, date_added, author_id, publisher, isbn, pages, language) 
-            VALUES ('$title', '$description', '$price', '$image', '$date_published', NOW(), '$authorId', '$publisher', '$isbn', '$pages', '$language')";
+    $sql = "INSERT INTO books (title, description, price, image_url, pdf_url, date_published, date_added, language, author_id, publisher, isbn, pages) 
+            VALUES ('$title', '$description', '$price', '$image', '$pdfUrl', '$date_published', NOW(), '$language', '$authorId', '$publisher', '$isbn', '$pages')";
+
+    echo "SQL Query: " . $sql; // Debugging line - Remove this in production
 
     if ($conn->query($sql) === TRUE) {
         $book_id = $conn->insert_id; // Get the inserted book's ID
@@ -111,7 +137,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 }
-
 
 ?>
 
@@ -272,7 +297,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
                 </div>
                 <div>
                 <label for="isbn">ISBN:</label>
-                <input type="text" id="isbn" name="isbn" maxlength="20" required>
+                <input type="text" id="isbn" name="isbn" maxlength="19" required>
                 </div>
             </div>
             <div class="form-row">
@@ -322,6 +347,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
                     </select>
                 </div>
             </div>
+            <div>
+    <label for="pdf">PDF File:</label>
+    <input type="file" id="pdf" name="pdf" accept=".pdf" required>
+</div>
+
             <div class="form-row full-width">
                 <button type="submit" name="submit">Add Book</button>
                 <button type="button" class="back-button" onclick="history.back()">Back</button>
