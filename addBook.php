@@ -41,6 +41,12 @@ function resizeImage($sourcePath, $targetPath, $width, $height) {
 
     return true;
 }
+
+// Sanitize filename
+function sanitizeFilename($filename) {
+    return preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $filename);
+}
+
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     // Get form data
@@ -56,8 +62,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     $genres = $_POST['genres']; // Array of genre IDs
 
     // Check if the author exists in the database
-    $checkAuthorQuery = "SELECT id FROM authors WHERE name = '$authorName'";
-    $authorResult = $conn->query($checkAuthorQuery);
+    $checkAuthorQuery = "SELECT id FROM authors WHERE name = ?";
+    $stmt = $conn->prepare($checkAuthorQuery);
+    $stmt->bind_param('s', $authorName);
+    $stmt->execute();
+    $authorResult = $stmt->get_result();
 
     if ($authorResult->num_rows > 0) {
         // Author already exists, get the ID
@@ -65,8 +74,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $authorId = $authorRow['id'];
     } else {
         // Author doesn't exist, create a new entry and get the ID
-        $createAuthorQuery = "INSERT INTO authors (name) VALUES ('$authorName')";
-        if ($conn->query($createAuthorQuery) === TRUE) {
+        $createAuthorQuery = "INSERT INTO authors (name) VALUES (?)";
+        $stmt = $conn->prepare($createAuthorQuery);
+        $stmt->bind_param('s', $authorName);
+        if ($stmt->execute()) {
             $authorId = $conn->insert_id; // Get the ID of the newly inserted author
         } else {
             echo "Error creating author: " . $conn->error;
@@ -84,8 +95,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
         $uploadPath = $uploadDirectory . $filename; // Final uploaded image path
         move_uploaded_file($tmp_name, $uploadPath);
 
-        // Resize uploaded image to 900x600
-        $resizedImagePath = $uploadDirectory . 'resized_' . $filename;
+        // Sanitize title to use as filename
+        $sanitizedTitle = sanitizeFilename($title);
+
+        // Resize uploaded image to 600x900 and rename it to book title
+        $resizedImagePath = $uploadDirectory . $sanitizedTitle . '.jpg';
         resizeImage($uploadPath, $resizedImagePath, 600, 900);
 
         // Delete the original uploaded image
@@ -95,50 +109,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
     }
 
     // Handling PDF upload
-if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
-    $pdfTmpName = $_FILES['pdf']['tmp_name'];
-    $pdfFilename = $_FILES['pdf']['name'];
-    $pdfExtension = pathinfo($pdfFilename, PATHINFO_EXTENSION);
-    $pdfNewName = $title . '.' . $pdfExtension; // Rename PDF file to book title
+    if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
+        $pdfTmpName = $_FILES['pdf']['tmp_name'];
+        $pdfFilename = $_FILES['pdf']['name'];
+        $pdfExtension = pathinfo($pdfFilename, PATHINFO_EXTENSION);
+        $pdfNewName = sanitizeFilename($title) . '.' . $pdfExtension; // Rename PDF file to book title
 
-    // Define the directory to upload PDF files
-    $pdfDirectory = 'pdf_files/';
-    $pdfUploadPath = $pdfDirectory . $pdfNewName;
+        // Define the directory to upload PDF files
+        $pdfDirectory = 'pdf_files/';
+        $pdfUploadPath = $pdfDirectory . $pdfNewName;
 
-    // Move the uploaded PDF file to the specified directory with the new name
-    if (move_uploaded_file($pdfTmpName, $pdfUploadPath)) {
-        // Update the PDF URL in the database
-        $pdfUrl = $pdfUploadPath;
+        // Move the uploaded PDF file to the specified directory with the new name
+        if (move_uploaded_file($pdfTmpName, $pdfUploadPath)) {
+            // Update the PDF URL in the database
+            $pdfUrl = $pdfUploadPath;
+        } else {
+            echo "Error moving PDF file to destination.";
+            exit();
+        }
     } else {
-        echo "Error moving PDF file to destination.";
+        echo "Error uploading PDF file.";
         exit();
     }
-} else {
-    echo "Error uploading PDF file.";
-    exit();
-}
 
     // Prepare and execute SQL query to insert data into 'books' table
     $sql = "INSERT INTO books (title, description, price, image_url, pdf_url, date_published, date_added, language, author_id, publisher, isbn, pages) 
-            VALUES ('$title', '$description', '$price', '$image', '$pdfUrl', '$date_published', NOW(), '$language', '$authorId', '$publisher', '$isbn', '$pages')";
+            VALUES (?, ?, ?, ?, ?, ?, NOW(), ?, ?, ?, ?, ?)";
 
-    echo "SQL Query: " . $sql; // Debugging line - Remove this in production
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param('ssssssssssi', $title, $description, $price, $image, $pdfUrl, $date_published, $language, $authorId, $publisher, $isbn, $pages);
 
-    if ($conn->query($sql) === TRUE) {
+    if ($stmt->execute()) {
         $book_id = $conn->insert_id; // Get the inserted book's ID
 
         // Insert genres into the book_genres table
+        $genreStmt = $conn->prepare("INSERT INTO book_genres (book_id, genre_id) VALUES (?, ?)");
         foreach ($genres as $genre_id) {
-            $conn->query("INSERT INTO book_genres (book_id, genre_id) VALUES ('$book_id', '$genre_id')");
+            $genreStmt->bind_param('ii', $book_id, $genre_id);
+            $genreStmt->execute();
         }
 
         echo '<script>alert("Book added successfully!")</script>';
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        echo "Error: " . $stmt->error;
     }
 }
-
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -272,8 +289,7 @@ if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
                 .catch(error => console.error('Error fetching authors:', error));
         });
     });
-</script>
-
+    </script>
 </head>
 <body>
     <div class="container">
@@ -285,10 +301,10 @@ if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
                     <input type="text" id="title" name="title" required>
                 </div>
                 <div>
-        <label for="author">Author:</label>
-        <input type="text" id="author" name="author" list="authorList" required>
-        <datalist id="authorList"></datalist>
-    </div>
+                    <label for="author">Author:</label>
+                    <input type="text" id="author" name="author" list="authorList" required>
+                    <datalist id="authorList"></datalist>
+                </div>
             </div>
             <div class="form-row">
                 <div>
@@ -296,8 +312,8 @@ if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
                     <input type="text" id="publisher" name="publisher" required>
                 </div>
                 <div>
-                <label for="isbn">ISBN:</label>
-                <input type="text" id="isbn" name="isbn" maxlength="19" required>
+                    <label for="isbn">ISBN:</label>
+                    <input type="text" id="isbn" name="isbn" maxlength="19" required>
                 </div>
             </div>
             <div class="form-row">
@@ -315,13 +331,10 @@ if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
                     <label for="date_published">Date Published:</label>
                     <input type="date" id="date_published" name="date_published" required>
                 </div>
-                <div class="form-row">
-    <div>
-        <label for="language">Language:</label>
-        <input type="text" id="language" name="language" required>
-    </div>
-</div>
-
+                <div>
+                    <label for="language">Language:</label>
+                    <input type="text" id="language" name="language" required>
+                </div>
                 <div>
                     <label for="image">Image:</label>
                     <input type="file" id="image" name="image" accept="image/*" required>
@@ -347,11 +360,12 @@ if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
                     </select>
                 </div>
             </div>
-            <div>
-    <label for="pdf">PDF File:</label>
-    <input type="file" id="pdf" name="pdf" accept=".pdf" required>
-</div>
-
+            <div class="form-row full-width">
+                <div>
+                    <label for="pdf">PDF File:</label>
+                    <input type="file" id="pdf" name="pdf" accept=".pdf" required>
+                </div>
+            </div>
             <div class="form-row full-width">
                 <button type="submit" name="submit">Add Book</button>
                 <button type="button" class="back-button" onclick="history.back()">Back</button>
@@ -360,5 +374,4 @@ if (isset($_FILES['pdf']) && $_FILES['pdf']['error'] === UPLOAD_ERR_OK) {
         <button class="add-genre-button" onclick="window.location.href='addGenre.php'">Add New Genre</button>
     </div>
 </body>
-
 </html>

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 18, 2024 at 03:08 AM
+-- Generation Time: Jun 18, 2024 at 02:57 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -80,14 +80,14 @@ INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `pdf_ur
 (36, 'Tensura Vol 7', 'Volume 7', 12.00, 'uploads/resized_cover.png', 'pdf_files/Tensura Vol 7.pdf', '2024-06-14', '2024-06-18', 'English', 4, 'Japan', ' 9781975301163 ', 317),
 (37, 'Tensura Vol 8', 'Volume 8', 23.00, 'uploads/resized_cover (1).png', 'pdf_files/Tensura Vol 8.pdf', '2024-06-12', '2024-06-18', 'English', 4, 'Japan', ' 9781975301164', 257),
 (38, 'Tensura Vol 9', 'Volume 9', 23.00, 'uploads/resized_cover (2).png', 'pdf_files/Tensura Vol 9.pdf', '2024-06-02', '2024-06-18', 'English', 4, 'Japan', ' 9781975301165', 284),
-(39, 'Volume 10', 'Volume 10', 32.00, 'uploads/resized_cover.jpeg', 'pdf_files/Volume 10.pdf', '2024-06-02', '2024-06-18', 'English', 4, 'Japan', ' 9781975301166', 301),
 (40, 'Tensura Volume 11', 'Volume 11', 23.00, 'uploads/resized_cover (3).png', 'pdf_files/Tensura Volume 11.pdf', '2024-06-06', '2024-06-18', 'English', 4, 'Japan', ' 9781975301168', 301),
 (41, 'Tensura Volume 12', 'Volume 12', 23.00, 'uploads/resized_cover (4).png', 'pdf_files/Tensura Volume 12.pdf', '2024-06-21', '2024-06-18', 'English', 4, 'Japan', ' 9781975301169', 263),
 (42, 'Art of War', 'Art of War by Sun Tzu', 21.00, 'uploads/resized_the-art-of-war-9781626860605_hr.jpg', 'pdf_files/Art of War.pdf', '2024-06-13', '2024-06-18', 'English', 8, 'China', ' 9781975301182', 66),
 (44, 'A Book of Five Rings', 'Masterpiece of a book', 12.00, 'uploads/resized_867247.jpg', 'pdf_files/A Book of Five Rings.pdf', '2024-06-08', '2024-06-18', 'English', 9, 'Japan', ' 9781975301180', 102),
 (45, 'When Titans Clashed', 'World War II', 21.00, 'uploads/resized_91QdDeRg54L._AC_UF1000,1000_QL80_.jpg', 'pdf_files/When Titans Clashed.pdf', '2024-06-09', '2024-06-18', 'English', 10, 'England', ' 9781975301143', 577),
 (46, 'Hunt for Red October', 'Red October', 12.00, 'uploads/resized_mini_magick20190616-19681-xwyhn7.png', 'pdf_files/Hunt for Red October.pdf', '2024-06-21', '2024-06-18', 'English', 11, 'England', ' 9781975301132', 302),
-(48, 'The Cold War ', 'The Cold War ended in 1991 with a fall of Soviet Union. Since then, one full generation has grown up who have no personal recollection of that era. The libraries are full of scholarly tomes covering the Cold War period, which tell the whole story. However, it is rare to find a book which captures the essence of the Cold War in one concise volume, readable by students and the general public. John Lewis Gaddis, a professor of history at Yale University has filled up that gap by writing his treatise “The Cold War: A New History” especially aimed at students and the laymen. This book review covers the various facets of Lewis’s book giving the strengths and weaknesses of the author’s treatment of the subject.', 23.00, 'uploads/resized_coldwar.JPG', 'pdf_files/The Cold War .pdf', '2024-06-08', '2024-06-18', 'English', 12, 'England', '4896374738', 254);
+(48, 'The Cold War ', 'The Cold War ended in 1991 with a fall of Soviet Union. Since then, one full generation has grown up who have no personal recollection of that era. The libraries are full of scholarly tomes covering the Cold War period, which tell the whole story. However, it is rare to find a book which captures the essence of the Cold War in one concise volume, readable by students and the general public. John Lewis Gaddis, a professor of history at Yale University has filled up that gap by writing his treatise “The Cold War: A New History” especially aimed at students and the laymen. This book review covers the various facets of Lewis’s book giving the strengths and weaknesses of the author’s treatment of the subject.', 23.00, 'uploads/resized_coldwar.JPG', 'pdf_files/The Cold War .pdf', '2024-06-08', '2024-06-18', 'English', 12, 'England', '4896374738', 254),
+(54, 'Tensura Volume 10', 'The Tempest Founder’s Festival was a roaring success, and after working out a few kinks, the Advanced Dungeon is proving to be a major Tempest tourist attraction. Now Rimuru\'s next objective is to join the infamous Council of the West—however, a certain influential figure working from the shadows of the Council has no intention of allowing someone as powerful as Rimuru to take a seat at the table, and she will stop at nothing to quietly snuff them out before they make any moves!', 32.00, 'uploads/Tensura_Volume_10.jpg', 'pdf_files/Tensura_Volume_10.pdf', '2024-06-02', '2024-06-18', 'English', 4, 'Japan', '9784896376302', 301);
 
 -- --------------------------------------------------------
 
@@ -109,14 +109,14 @@ INSERT INTO `book_genres` (`book_id`, `genre_id`) VALUES
 (36, 1),
 (37, 1),
 (38, 1),
-(39, 1),
 (40, 1),
 (41, 1),
 (42, 4),
 (44, 4),
 (45, 4),
 (46, 4),
-(48, 4);
+(48, 4),
+(54, 1);
 
 -- --------------------------------------------------------
 
@@ -183,8 +183,7 @@ INSERT INTO `purchased_books` (`id`, `user_id`, `book_id`, `purchase_date`) VALU
 (6, 5, 44, '2024-06-18 06:45:29'),
 (7, 5, 46, '2024-06-18 06:45:44'),
 (8, 5, 45, '2024-06-18 06:46:01'),
-(10, 5, 39, '2024-06-18 06:49:17'),
-(11, 3, 39, '2024-06-18 07:38:45');
+(12, 5, 54, '2024-06-18 19:56:01');
 
 -- --------------------------------------------------------
 
@@ -278,7 +277,8 @@ CREATE TABLE `wishlist` (
 
 INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
 (67, 5, NULL, '2024-06-17 08:24:48'),
-(68, 5, NULL, '2024-06-17 08:24:55');
+(68, 5, NULL, '2024-06-17 08:24:55'),
+(77, 5, 40, '2024-06-18 12:19:03');
 
 --
 -- Indexes for dumped tables
@@ -369,7 +369,7 @@ ALTER TABLE `authors`
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `genres`
@@ -387,7 +387,7 @@ ALTER TABLE `payment_options`
 -- AUTO_INCREMENT for table `purchased_books`
 --
 ALTER TABLE `purchased_books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -411,7 +411,7 @@ ALTER TABLE `user_details`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
 
 --
 -- Constraints for dumped tables

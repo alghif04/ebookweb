@@ -17,9 +17,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['book_id'])) {
             $imageUrl = $row['image_url'];
             $pdfUrl = $row['pdf_url'];
 
-            // Delete image file from uploads folder
+            // Determine the resized image path based on the original image's filename
+            $pathInfo = pathinfo($imageUrl);
+            $resizedImageUrl = $pathInfo['dirname'] . '/resized_' . $pathInfo['filename'] . '.' . $pathInfo['extension'];
+
+            // Delete original image file from uploads folder
             if (file_exists($imageUrl)) {
                 unlink($imageUrl);
+            }
+
+            // Delete resized image file if it exists
+            if (file_exists($resizedImageUrl)) {
+                unlink($resizedImageUrl);
             }
 
             // Delete PDF file
