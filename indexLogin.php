@@ -26,6 +26,10 @@ session_start();
             padding: 1rem;
         }
 
+        .search {
+            margin-bottom: 20px;
+        }
+
         .sort-box {
             display: flex;
             justify-content: flex-start;
@@ -83,6 +87,15 @@ session_start();
 
         .SortValue {
             font-size: 1.2rem;
+        }
+
+        .book-section {
+            margin-bottom: 40px;
+        }
+
+        .book-section h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
         }
 
         .product-catalog {
@@ -171,104 +184,151 @@ session_start();
 </head>
 <body>
 <?php include 'header.php'; ?>
-    <?php include 'sidebar.php'; ?>
-    <div class="main-content">
-        <div class="search">
-            <input type="text" id="searchInput" placeholder="Search by title or author">
+<?php include 'sidebar.php'; ?>
+<div class="main-content">
+    <div class="search">
+        <input type="text" id="searchInput" placeholder="Search by title or author">
+    </div>
+    <div class="sort-box">
+        <span class="SortLabel">Sort by:</span>
+        <div class="SortContainer">
+            <span class="SortLabel"><a href="#" id="sort-title">Title</a></span>
         </div>
-        <div class="sort-box">
-            <span class="SortLabel">Sort by:</span>
-            <div class="SortContainer">
-                <span class="SortLabel"><a href="#" id="sort-title">Title</a></span>
-            </div>
-            <div class="SortContainer">
-                <span class="SortLabel"><a href="#" id="sort-date-published">Date Published</a></span>
-            </div>
-            <div class="SortContainer">
-                <span class="SortLabel"><a href="#" id="sort-date-added">Date Added</a></span>
-            </div>
+        <div class="SortContainer">
+            <span class="SortLabel"><a href="#" id="sort-date-published">Date Published</a></span>
         </div>
-
-        <div class="product-catalog">
-            <?php
-            // Include your database connection and fetching logic
-            include 'dbconn.php'; 
-
-            // Fetch book data
-            $sql = "SELECT id, title, description, price, image_url, date_published, date_added FROM books";
-            $result = $conn->query($sql);
-
-            $books = [];
-            if ($result->num_rows > 0) {
-                while($row = $result->fetch_assoc()) {
-                    $books[] = $row;
-                }
-            }
-
-            // Generate HTML for each book
-            foreach ($books as $book) {
-                echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="viewBook.php?id=' . $book['id'] . '" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
-                echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
-                echo '<div class="product-item-content">';
-                echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
-                echo '<p>$' . $book['price'] . '</p>';
-                echo '</div>';
-                echo '<button class="wishlist-button" onclick="addToWishlist(' . $book['id'] . ')">♡ Wishlist</button>';
-                echo '</div>';
-            }
-            ?>
-        </div>
-        <div class="product-preview" id="product-preview">
-            <h3 id="preview-title">Product Title</h3>
-            <p id="preview-description">Product description will appear here when you hover over a product.</p>
-            <a id="preview-price" href="#" target="_blank">Price</a>
+        <div class="SortContainer">
+            <span class="SortLabel"><a href="#" id="sort-date-added">Date Added</a></span>
         </div>
     </div>
-    <script>
-document.querySelectorAll('.product-item').forEach(item => {
-    const wishlistButton = item.querySelector('.wishlist-button');
-    wishlistButton.addEventListener('click', function (event) {
-        event.preventDefault(); // Prevent default form submission
-        event.stopPropagation(); // Stop event propagation
 
-        const id = item.getAttribute('data-id');
-        addToWishlist(id, wishlistButton); // Pass the button directly to addToWishlist
+    <div class="product-catalog">
+        <?php
+        // Include your database connection
+        include 'dbconn.php';
 
-        wishlistButton.disabled = true; // Disable the button immediately after click
-    });
-});
+        // Function to display a book
+        function displayBook($book) {
+            $bookId = $book['id'];
+            $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-function addToWishlist(id, buttonElement) {
-    console.log('Adding book to wishlist with ID:', id);
+            global $conn;
 
-    // Disable the button to prevent multiple clicks
-    buttonElement.disabled = true;
+            if ($userId) {
+                $sql = "SELECT 1 FROM purchased_books WHERE user_id = ? AND book_id = ?";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param("ii", $userId, $bookId);
+                $stmt->execute();
+                $purchaseResult = $stmt->get_result();
 
-    <?php if (isset($_SESSION['username'])) { ?>
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "wishlist_handler.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            if (response.status === 'success') {
-                alert('Book added to wishlist');
+                if ($purchaseResult->num_rows > 0) {
+                    $book['purchased'] = true;
+                } else {
+                    $book['purchased'] = false;
+                }
             } else {
-                alert(response.message);
+                $book['purchased'] = false;
             }
-            buttonElement.disabled = false; // Re-enable the button after handling the response
+
+            echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="viewBook.php?id=' . $book['id'] . '" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
+            echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
+            echo '<div class="product-item-content">';
+            echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
+            echo '<p>$' . $book['price'] . '</p>';
+            echo '</div>';
+            if ($book['purchased']) {
+                echo '<button class="read-button" onclick="readBook(' . $book['id'] . ')">Read the Book</button>';
+            } else {
+                echo '<button class="wishlist-button" onclick="addToWishlist(' . $book['id'] . ')">♡ Wishlist</button>';
+            }
+            echo '</div>';
         }
-    };
 
-    xhr.send(`book_id=${id}`);
-    <?php } else { ?>
-    openPopup(event);
-    <?php } ?>
-}
+        // Fetch best sellers
+        $sqlBestSellers = "
+            SELECT books.id, books.title, books.description, books.price, books.image_url, books.date_published, books.date_added, COUNT(purchased_books.book_id) as purchase_count 
+            FROM books 
+            JOIN purchased_books ON books.id = purchased_books.book_id 
+            GROUP BY books.id 
+            ORDER BY purchase_count DESC 
+            LIMIT 5";
+        $resultBestSellers = $conn->query($sqlBestSellers);
 
+        if ($resultBestSellers->num_rows > 0) {
+            echo '<div class="book-section">';
+            echo '<h2>Best Sellers</h2>';
+            echo '<div class="product-catalog">';
+            while($row = $resultBestSellers->fetch_assoc()) {
+                displayBook($row);
+            }
+            echo '</div>';
+            echo '</div>';
+        }
 
+        // Fetch genres that have books
+        $sqlGenres = "
+            SELECT genres.id, genres.name 
+            FROM genres 
+             JOIN book_genres ON genres.id = book_genres.genre_id 
+            GROUP BY genres.id 
+            HAVING COUNT(book_genres.book_id) > 0 
+            ORDER BY RAND() 
+            LIMIT 2";
+        $resultGenres = $conn->query($sqlGenres);
+        $genres = [];
+        if ($resultGenres->num_rows > 0) {
+            while ($row = $resultGenres->fetch_assoc()) {
+                $genres[] = $row;
+            }
+        }
 
+        // Fetch books by genre
+        foreach ($genres as $genre) {
+            $genreId = $genre['id'];
+            $genreName = $genre['name'];
+            $sqlGenreBooks = "
+                SELECT books.id, books.title, books.description, books.price, books.image_url, books.date_published, books.date_added 
+                FROM books 
+                JOIN book_genres ON books.id = book_genres.book_id 
+                WHERE book_genres.genre_id = $genreId 
+                LIMIT 5";
+            $resultGenreBooks = $conn->query($sqlGenreBooks);
+
+            if ($resultGenreBooks->num_rows > 0) {
+                echo '<div class="book-section">';
+                echo "<h2>$genreName Books</h2>";
+                echo '<div class="product-catalog">';
+                while($row = $resultGenreBooks->fetch_assoc()) {
+                    displayBook($row);
+                }
+                echo '</div>';
+                echo '</div>';
+            }
+        }
+
+        // Fetch all books
+        $sqlAllBooks = "SELECT id, title, description, price, image_url, date_published, date_added FROM books";
+        $resultAllBooks = $conn->query($sqlAllBooks);
+
+        if ($resultAllBooks->num_rows > 0) {
+            echo '<div class="book-section">';
+            echo '<h2>All Books</h2>';
+            echo '<div class="product-catalog">';
+            while($row = $resultAllBooks->fetch_assoc()) {
+                displayBook($row);
+            }
+            echo '</div>';
+            echo '</div>';
+        }
+        ?>
+    </div>
+    <div class="product-preview" id="product-preview">
+        <h3 id="preview-title">Product Title</h3>
+        <p id="preview-description">Product description will appear here when you hover over a product.</p>
+        <a id="preview-price" href="#" target="_blank">Price</a>
+    </div>
+</div>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     const searchInput = document.getElementById('searchInput');
     const productCatalog = document.querySelector('.product-catalog');
@@ -287,20 +347,56 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     }
+
     searchInput.addEventListener('input', function () {
         const searchTerm = this.value.trim().toLowerCase();
         filterProducts(searchTerm);
     });
+
+    productCatalog.addEventListener('click', function (event) {
+        const productItem = event.target.closest('.product-item');
+        if (productItem) {
+            const url = productItem.getAttribute('data-url');
+            window.location.href = url;
+        }
+    });
+
+    document.querySelectorAll('.wishlist-button, .read-button').forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.stopPropagation();
+        });
+    });
 });
 
-document.querySelectorAll('.product-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const url = this.getAttribute('data-url');
-                window.location.href = url;
-            });
-        });
+function addToWishlist(id) {
+    console.log('Adding book to wishlist with ID:', id);
 
+    <?php if (isset($_SESSION['username'])) { ?>
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "wishlist_handler.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    </script>
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
+            if (response.status === 'success') {
+                alert('Book added to wishlist');
+            } else {
+                alert(response.message);
+            }
+        }
+    };
+
+    xhr.send(`book_id=${id}`);
+    <?php } else { ?>
+    openPopup(event);
+    <?php } ?>
+}
+
+function readBook(id) {
+    window.location.href = 'readBook.php?book_id=' + id;
+}
+</script>
 </body>
 </html>
+

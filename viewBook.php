@@ -5,6 +5,7 @@ require 'dbconn.php';
 // Check if the book_id parameter is set in the URL
 if (isset($_GET['id'])) {
     $bookId = $_GET['id'];
+    $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
     // Fetch book details from the database
     $sql = "SELECT b.*, a.name AS author_name, b.language AS book_language, GROUP_CONCAT(g.name SEPARATOR ', ') AS genres
@@ -27,6 +28,18 @@ if (isset($_GET['id'])) {
         exit();
     }
     
+        // Check if the user has already purchased the book
+        $isPurchased = false;
+        if ($userId) {
+            $sql = "SELECT 1 FROM purchased_books WHERE user_id = ? AND book_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("ii", $userId, $bookId);
+            $stmt->execute();
+            $purchaseResult = $stmt->get_result();
+            if ($purchaseResult->num_rows > 0) {
+                $isPurchased = true;
+            }
+        }
 
     // Handle rating submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id']) && !isset($_POST['delete_comment'])) {
@@ -358,14 +371,18 @@ if (isset($_GET['id'])) {
                 </div>
             </div>
             <div class="buttons">
-            <a href="#" class="purchase-button" onclick="showCardSelection()">Purchase</a>
-                <?php if (isset($_SESSION['user_id'])) { ?>
-                <form action="viewBook.php?id=<?php echo $bookId; ?>" method="POST" style="display: inline;">
-                    <input type="hidden" name="wishlist" value="1">
-                    <button type="submit" class="wishlist-button">Add to Wishlist</button>
-                </form>
+                <?php if ($isPurchased) { ?>
+                    <a href="readBook.php?book_id=<?php echo $bookId; ?>" class="purchase-button">Read the Book</a>
                 <?php } else { ?>
-                <a href="login.php" class="wishlist-button">Add to Wishlist</a>
+                    <a href="#" class="purchase-button" onclick="showCardSelection()">Purchase</a>
+                    <?php if (isset($_SESSION['user_id'])) { ?>
+                        <form action="viewBook.php?id=<?php echo $bookId; ?>" method="POST" style="display: inline;">
+                            <input type="hidden" name="wishlist" value="1">
+                            <button type="submit" class="wishlist-button">Add to Wishlist</button>
+                        </form>
+                    <?php } else { ?>
+                        <a href="login.php" class="wishlist-button">Add to Wishlist</a>
+                    <?php } ?>
                 <?php } ?>
             </div>
         </div>

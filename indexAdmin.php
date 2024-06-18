@@ -222,9 +222,10 @@ session_start();
                 echo '<p>$' . $book['price'] . '</p>';
                 echo '</div>';
                 echo '<button class="wishlist-button" onclick="addToWishlist(' . $book['id'] . ')">♡ Wishlist</button>';
-                echo '<button class="delete-button" onclick="deleteBook(' . $book['id'] . ')"></button>'; // X button for delete
+                echo '<button class="delete-button" onclick="deleteBook(' . $book['id'] . ', event)"></button>'; // X button for delete
                 echo '</div>';
             }
+            
             ?>
         </div>
     </div>
@@ -272,8 +273,10 @@ function addToWishlist(id, button) {
     xhr.send('bookId=' + id);
 }
 
-function deleteBook(bookId) {
+function deleteBook(bookId, event) {
     if (confirm('Are you sure you want to delete this book?')) {
+        event.stopPropagation(); // Stop event propagation
+
         const xhr = new XMLHttpRequest();
         xhr.open('POST', 'deleteBook.php', true);
         xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -285,9 +288,10 @@ function deleteBook(bookId) {
                 alert('Error deleting book. Please try again.');
             }
         };
-        xhr.send('bookId=' + bookId);
+        xhr.send('book_id=' + bookId); // Use 'book_id' instead of 'bookId' in the request parameter
     }
 }
+
 
 function sortProductItems(sortType) {
     const container = document.querySelector('.product-catalog');

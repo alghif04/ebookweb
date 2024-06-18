@@ -5,21 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-    .popup {
-        width: 400px;
-        background: #fff;
-        border-radius: 6px;
-        position:absolute;
-        top: 0;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.1);
-        text-align: center;
-        padding: 0 30px 30px;
-        color: #333;
-        visibility: hidden;
-        transition: transform 0.4s, top 0.4s, visibility 0.4s;
-        z-index: 1000;
-    }
+.popup {
+    width: 400px;
+    background: #fff;
+    border-radius: 6px;
+    position: fixed; /* Change from absolute to fixed */
+    top: 50%; /* Position at the vertical center of the viewport */
+    left: 50%; /* Position at the horizontal center of the viewport */
+    transform: translate(-50%, -50%) scale(0.1);
+    text-align: center;
+    padding: 0 30px 30px;
+    color: #333;
+    visibility: hidden;
+    transition: transform 0.4s, top 0.4s, visibility 0.4s;
+    z-index: 1000;
+}
+
+.about {
+    width: 400px;
+    max-width: 90%;
+    background: #f7f7f7;
+    border-radius: 10px;
+    position: fixed; /* Change from absolute to fixed */
+    top: 50%; /* Position at the vertical center of the viewport */
+    left: 50%; /* Position at the horizontal center of the viewport */
+    transform: translate(-50%, -50%) scale(0.1);
+    text-align: center;
+    padding: 30px;
+    color: #333;
+    visibility: hidden;
+    transition: transform 0.4s, top 0.4s, visibility 0.4s;
+    z-index: 1001;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
 
     .open-popup {
         visibility: visible;
@@ -54,23 +73,6 @@
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     }
 
-    .about {
-        width: 400px;
-        max-width: 90%;
-        background: #f7f7f7;
-        border-radius: 10px;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) scale(0.1);
-        text-align: center;
-        padding: 30px;
-        color: #333;
-        visibility: hidden;
-        transition: transform 0.4s, top 0.4s, visibility 0.4s;
-        z-index: 1001;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
 
     .open-about {
     visibility: visible;
@@ -143,25 +145,32 @@
     </div>
 
 <script>
-    //Popup belum login
-    let popup = document.getElementById("popup");
-    function openPopup(event){
-        event.preventDefault();
-        popup.classList.add("open-popup");
-    }
-    function closePopup(){
-        popup.classList.remove("open-popup");
-    }
+// Popup belum login
+let popup = document.getElementById("popup");
+function openPopup(event){
+    event.preventDefault();
+    popup.classList.add("open-popup");
+    document.body.style.overflow = "hidden"; // Prevent scrolling when popup is open
+}
 
-    //Popup about
-    let about = document.getElementById("about");
-    function openAbout(event){
-        event.preventDefault();
-        about.classList.add("open-about");
-    }
-    function closeAbout(){
-        about.classList.remove("open-about");
-    }
+function closePopup(){
+    popup.classList.remove("open-popup");
+    document.body.style.overflow = "auto"; // Restore scrolling when popup is closed
+}
+
+// Popup about
+let about = document.getElementById("about");
+function openAbout(event){
+    event.preventDefault();
+    about.classList.add("open-about");
+    document.body.style.overflow = "hidden"; // Prevent scrolling when popup is open
+}
+
+function closeAbout(){
+    about.classList.remove("open-about");
+    document.body.style.overflow = "auto"; // Restore scrolling when popup is closed
+}
+
 
 </script>
 </body>
