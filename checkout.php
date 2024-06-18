@@ -5,37 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout Page</title>
     <link rel="stylesheet" href="cekout.css">
-    <style>
-        .star-rating {
-            direction: ltr;
-            display: flex;
-            flex-direction: row-reverse;
-            padding: 20px;
-            justify-content: center;
-        }
-
-        .star-rating input[type=radio] {
-            display: none;
-        }
-
-        .star-rating label {
-            font-size: 2em;
-            color: lightgray;
-            cursor: pointer;
-            display: inline-block;
-            position: relative;
-        }
-
-        .star-rating input[type=radio]:checked ~ label,
-        .star-rating label:hover,
-        .star-rating label:hover ~ label {
-            color: gold;
-        }
-
-        .star-rating label:hover ~ label {
-            color: gold;
-        }
-    </style>
     <script>
         const bookPrices = {
             "book1": 100000,
@@ -81,16 +50,6 @@
                     <option value="paypal">PayPal</option>
                     <option value="bank_transfer">Transfer Bank</option>
                 </select>
-            </div>
-            <div class="form-group">
-                <label for="rating">Rating:</label>
-                <div class="star-rating">
-                    <input type="radio" id="star5" name="rating" value="5"><label for="star5">&#9733;</label>
-                    <input type="radio" id="star4" name="rating" value="4"><label for="star4">&#9733;</label>
-                    <input type="radio" id="star3" name="rating" value="3"><label for="star3">&#9733;</label>
-                    <input type="radio" id="star2" name="rating" value="2"><label for="star2">&#9733;</label>
-                    <input type="radio" id="star1" name="rating" value="1"><label for="star1">&#9733;</label>
-                </div>
             </div>
             <button type="submit">Bayar Sekarang</button>
         </form>
