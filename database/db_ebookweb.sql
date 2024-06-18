@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 17, 2024 at 04:34 PM
+-- Generation Time: Jun 18, 2024 at 03:08 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,7 +41,13 @@ INSERT INTO `authors` (`id`, `name`) VALUES
 (2, 'Kadokawa'),
 (3, 'yenisey'),
 (4, 'Fuse'),
-(6, 'asasas');
+(6, 'asasas'),
+(7, 'George Orwell'),
+(8, 'Sun Tzu'),
+(9, 'Musashi Miyamoto'),
+(10, 'David Glantz'),
+(11, 'Tom Clancy'),
+(12, 'John Lewis');
 
 -- --------------------------------------------------------
 
@@ -52,7 +58,7 @@ INSERT INTO `authors` (`id`, `name`) VALUES
 CREATE TABLE `books` (
   `id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
-  `description` text DEFAULT NULL,
+  `description` longtext DEFAULT NULL,
   `price` decimal(10,2) DEFAULT NULL,
   `image_url` varchar(255) DEFAULT NULL,
   `pdf_url` varchar(255) DEFAULT NULL,
@@ -70,7 +76,18 @@ CREATE TABLE `books` (
 --
 
 INSERT INTO `books` (`id`, `title`, `description`, `price`, `image_url`, `pdf_url`, `date_published`, `date_added`, `language`, `author_id`, `publisher`, `isbn`, `pages`) VALUES
-(34, 'Tensura Volume 6', 'Rimuru adventure around the world', 23.00, 'uploads/resized_71lz+YIi8zL._AC_UF894,1000_QL80_.jpg', 'pdf_files/Tensura Volume 6.pdf', '2024-06-08', '2024-06-17', 'English', 4, 'Japan', ' 9781632366405', 326);
+(34, 'Tensura Volume 6', 'Rimuru adventure around the world', 23.00, 'uploads/resized_71lz+YIi8zL._AC_UF894,1000_QL80_.jpg', 'pdf_files/Tensura Volume 6.pdf', '2024-06-08', '2024-06-17', 'English', 4, 'Japan', ' 9781632366405', 326),
+(36, 'Tensura Vol 7', 'Volume 7', 12.00, 'uploads/resized_cover.png', 'pdf_files/Tensura Vol 7.pdf', '2024-06-14', '2024-06-18', 'English', 4, 'Japan', ' 9781975301163 ', 317),
+(37, 'Tensura Vol 8', 'Volume 8', 23.00, 'uploads/resized_cover (1).png', 'pdf_files/Tensura Vol 8.pdf', '2024-06-12', '2024-06-18', 'English', 4, 'Japan', ' 9781975301164', 257),
+(38, 'Tensura Vol 9', 'Volume 9', 23.00, 'uploads/resized_cover (2).png', 'pdf_files/Tensura Vol 9.pdf', '2024-06-02', '2024-06-18', 'English', 4, 'Japan', ' 9781975301165', 284),
+(39, 'Volume 10', 'Volume 10', 32.00, 'uploads/resized_cover.jpeg', 'pdf_files/Volume 10.pdf', '2024-06-02', '2024-06-18', 'English', 4, 'Japan', ' 9781975301166', 301),
+(40, 'Tensura Volume 11', 'Volume 11', 23.00, 'uploads/resized_cover (3).png', 'pdf_files/Tensura Volume 11.pdf', '2024-06-06', '2024-06-18', 'English', 4, 'Japan', ' 9781975301168', 301),
+(41, 'Tensura Volume 12', 'Volume 12', 23.00, 'uploads/resized_cover (4).png', 'pdf_files/Tensura Volume 12.pdf', '2024-06-21', '2024-06-18', 'English', 4, 'Japan', ' 9781975301169', 263),
+(42, 'Art of War', 'Art of War by Sun Tzu', 21.00, 'uploads/resized_the-art-of-war-9781626860605_hr.jpg', 'pdf_files/Art of War.pdf', '2024-06-13', '2024-06-18', 'English', 8, 'China', ' 9781975301182', 66),
+(44, 'A Book of Five Rings', 'Masterpiece of a book', 12.00, 'uploads/resized_867247.jpg', 'pdf_files/A Book of Five Rings.pdf', '2024-06-08', '2024-06-18', 'English', 9, 'Japan', ' 9781975301180', 102),
+(45, 'When Titans Clashed', 'World War II', 21.00, 'uploads/resized_91QdDeRg54L._AC_UF1000,1000_QL80_.jpg', 'pdf_files/When Titans Clashed.pdf', '2024-06-09', '2024-06-18', 'English', 10, 'England', ' 9781975301143', 577),
+(46, 'Hunt for Red October', 'Red October', 12.00, 'uploads/resized_mini_magick20190616-19681-xwyhn7.png', 'pdf_files/Hunt for Red October.pdf', '2024-06-21', '2024-06-18', 'English', 11, 'England', ' 9781975301132', 302),
+(48, 'The Cold War ', 'The Cold War ended in 1991 with a fall of Soviet Union. Since then, one full generation has grown up who have no personal recollection of that era. The libraries are full of scholarly tomes covering the Cold War period, which tell the whole story. However, it is rare to find a book which captures the essence of the Cold War in one concise volume, readable by students and the general public. John Lewis Gaddis, a professor of history at Yale University has filled up that gap by writing his treatise “The Cold War: A New History” especially aimed at students and the laymen. This book review covers the various facets of Lewis’s book giving the strengths and weaknesses of the author’s treatment of the subject.', 23.00, 'uploads/resized_coldwar.JPG', 'pdf_files/The Cold War .pdf', '2024-06-08', '2024-06-18', 'English', 12, 'England', '4896374738', 254);
 
 -- --------------------------------------------------------
 
@@ -88,7 +105,18 @@ CREATE TABLE `book_genres` (
 --
 
 INSERT INTO `book_genres` (`book_id`, `genre_id`) VALUES
-(34, 1);
+(34, 1),
+(36, 1),
+(37, 1),
+(38, 1),
+(39, 1),
+(40, 1),
+(41, 1),
+(42, 4),
+(44, 4),
+(45, 4),
+(46, 4),
+(48, 4);
 
 -- --------------------------------------------------------
 
@@ -106,8 +134,10 @@ CREATE TABLE `genres` (
 --
 
 INSERT INTO `genres` (`id`, `name`) VALUES
+(4, 'History'),
 (2, 'Horror'),
-(1, 'Manga');
+(1, 'Manga'),
+(3, 'Politics');
 
 -- --------------------------------------------------------
 
@@ -149,7 +179,12 @@ CREATE TABLE `purchased_books` (
 --
 
 INSERT INTO `purchased_books` (`id`, `user_id`, `book_id`, `purchase_date`) VALUES
-(4, 5, 34, '2024-06-17 19:45:16');
+(4, 5, 34, '2024-06-17 19:45:16'),
+(6, 5, 44, '2024-06-18 06:45:29'),
+(7, 5, 46, '2024-06-18 06:45:44'),
+(8, 5, 45, '2024-06-18 06:46:01'),
+(10, 5, 39, '2024-06-18 06:49:17'),
+(11, 3, 39, '2024-06-18 07:38:45');
 
 -- --------------------------------------------------------
 
@@ -196,7 +231,8 @@ CREATE TABLE `user_cards` (
 INSERT INTO `user_cards` (`card_id`, `user_id`, `card_number`, `expiration_date`, `cvv`, `billing_address`, `created_at`) VALUES
 (9, 5, '21221', '2024-06-14', '212', 'Stone Street', '2024-06-17 14:28:39'),
 (10, 5, '33333', '2024-06-13', '122', 'Water Street', '2024-06-17 14:28:57'),
-(11, 5, '92399', '2024-06-22', '122', 'Fire Street', '2024-06-17 14:29:10');
+(11, 5, '92399', '2024-06-22', '122', 'Fire Street', '2024-06-17 14:29:10'),
+(12, 3, '2121', '2024-06-05', '221', 'Bruh Street', '2024-06-18 00:38:36');
 
 -- --------------------------------------------------------
 
@@ -242,8 +278,7 @@ CREATE TABLE `wishlist` (
 
 INSERT INTO `wishlist` (`wishlist_id`, `user_id`, `book_id`, `added_at`) VALUES
 (67, 5, NULL, '2024-06-17 08:24:48'),
-(68, 5, NULL, '2024-06-17 08:24:55'),
-(73, 5, 34, '2024-06-17 14:29:17');
+(68, 5, NULL, '2024-06-17 08:24:55');
 
 --
 -- Indexes for dumped tables
@@ -328,19 +363,19 @@ ALTER TABLE `wishlist`
 -- AUTO_INCREMENT for table `authors`
 --
 ALTER TABLE `authors`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `books`
 --
 ALTER TABLE `books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `genres`
 --
 ALTER TABLE `genres`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `payment_options`
@@ -352,19 +387,19 @@ ALTER TABLE `payment_options`
 -- AUTO_INCREMENT for table `purchased_books`
 --
 ALTER TABLE `purchased_books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `ratings`
 --
 ALTER TABLE `ratings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `user_cards`
 --
 ALTER TABLE `user_cards`
-  MODIFY `card_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `card_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `user_details`
@@ -376,7 +411,7 @@ ALTER TABLE `user_details`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=74;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=77;
 
 --
 -- Constraints for dumped tables
