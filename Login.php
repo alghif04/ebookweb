@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-COMPATIBLE" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Page</title>
+    <title>Login</title>
     <link rel="stylesheet" type="text/css" href="stylelogin.css">
 </head>
-<body>        
+<body>  
+<div class="header">Readopolis</div>      
     <div class="wrapper">
         <div class="form-wrapper sign-in">
             <form action="" method="post">
