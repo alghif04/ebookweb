@@ -1,6 +1,12 @@
 <?php
 session_start();
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
+    // Redirect to login page or an error page
+    header("Location: login.php");
+    exit();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>

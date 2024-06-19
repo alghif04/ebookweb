@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 18, 2024 at 02:57 PM
+-- Generation Time: Jun 19, 2024 at 04:10 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -183,7 +183,12 @@ INSERT INTO `purchased_books` (`id`, `user_id`, `book_id`, `purchase_date`) VALU
 (6, 5, 44, '2024-06-18 06:45:29'),
 (7, 5, 46, '2024-06-18 06:45:44'),
 (8, 5, 45, '2024-06-18 06:46:01'),
-(12, 5, 54, '2024-06-18 19:56:01');
+(12, 5, 54, '2024-06-18 19:56:01'),
+(13, 3, 46, '2024-06-19 16:29:28'),
+(14, 3, 54, '2024-06-19 16:34:06'),
+(15, 3, 44, '2024-06-19 16:34:15'),
+(16, 3, 48, '2024-06-19 16:34:23'),
+(17, 3, 45, '2024-06-19 16:34:37');
 
 -- --------------------------------------------------------
 
@@ -387,7 +392,7 @@ ALTER TABLE `payment_options`
 -- AUTO_INCREMENT for table `purchased_books`
 --
 ALTER TABLE `purchased_books`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `ratings`
@@ -411,7 +416,7 @@ ALTER TABLE `user_details`
 -- AUTO_INCREMENT for table `wishlist`
 --
 ALTER TABLE `wishlist`
-  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `wishlist_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=79;
 
 --
 -- Constraints for dumped tables

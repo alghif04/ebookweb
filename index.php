@@ -1,6 +1,7 @@
 <?php
 session_start();
-
+include 'dbconn.php';
+include 'functions.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,10 +26,6 @@ session_start();
             transition: all 0.5s ease;
             width: calc(100% - 80px);
             padding: 1rem;
-        }
-
-        .search {
-            margin-bottom: 20px;
         }
 
         .sort-box {
@@ -181,70 +178,74 @@ session_start();
             background-color: #007bff;
             color: #fff;
         }
+
+        .search-box {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .search-box input,
+        .search-box select {
+            width: 45%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+
+        .search-box button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-box button:hover {
+            background-color: #0056b3;
+        }
+        .search-box {
+            margin-bottom: 20px;
+        }
+        .search-box form {
+            display: flex;
+            align-items: center;
+        }
+        .search-box input, .search-box select, .search-box button {
+            margin-right: 10px;
+            padding: 5px;
+            font-size: 1rem;
+        }
+        .product-item {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 <?php include 'header.php'; ?>
 <?php include 'sidebar.php'; ?>
 <div class="main-content">
-    <div class="search">
-        <input type="text" id="searchInput" placeholder="Search by title or author">
+    <div class="search-box">
+        <form action="search.php" method="get">
+            <input type="text" name="title" placeholder="Search by title">
+            <select name="genre">
+                <option value="">All Genres</option>
+                <?php
+                $sqlGenres = "SELECT id, name FROM genres";
+                $resultGenres = $conn->query($sqlGenres);
+                if ($resultGenres->num_rows > 0) {
+                    while ($row = $resultGenres->fetch_assoc()) {
+                        echo '<option value="' . $row['id'] . '">' . htmlspecialchars($row['name']) . '</option>';
+                    }
+                }
+                ?>
+            </select>
+            <button type="submit">Search</button>
+        </form>
     </div>
-    <div class="sort-box">
-        <span class="SortLabel">Sort by:</span>
-        <div class="SortContainer">
-            <span class="SortLabel"><a href="#" id="sort-title">Title</a></span>
-        </div>
-        <div class="SortContainer">
-            <span class="SortLabel"><a href="#" id="sort-date-published">Date Published</a></span>
-        </div>
-        <div class="SortContainer">
-            <span class="SortLabel"><a href="#" id="sort-date-added">Date Added</a></span>
-        </div>
-    </div>
-
     <div class="product-catalog">
         <?php
-        // Include your database connection
-        include 'dbconn.php';
-
-        // Function to display a book
-        function displayBook($book) {
-            $bookId = $book['id'];
-            $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-
-            global $conn;
-
-            if ($userId) {
-                $sql = "SELECT 1 FROM purchased_books WHERE user_id = ? AND book_id = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("ii", $userId, $bookId);
-                $stmt->execute();
-                $purchaseResult = $stmt->get_result();
-
-                if ($purchaseResult->num_rows > 0) {
-                    $book['purchased'] = true;
-                } else {
-                    $book['purchased'] = false;
-                }
-            } else {
-                $book['purchased'] = false;
-            }
-
-            echo '<div class="product-item" data-id="' . $book['id'] . '" data-title="' . htmlspecialchars($book['title']) . '" data-description="' . htmlspecialchars($book['description']) . '" data-price="$' . $book['price'] . '" data-url="viewBook.php?id=' . $book['id'] . '" data-date-published="' . $book['date_published'] . '" data-date-added="' . $book['date_added'] . '">';
-            echo '<img src="' . htmlspecialchars($book['image_url']) . '" alt="' . htmlspecialchars($book['title']) . '">';
-            echo '<div class="product-item-content">';
-            echo '<h3>' . htmlspecialchars($book['title']) . '</h3>';
-            echo '<p>$' . $book['price'] . '</p>';
-            echo '</div>';
-            if ($book['purchased']) {
-                echo '<button class="read-button" onclick="readBook(' . $book['id'] . ')">Read the Book</button>';
-            } else {
-                echo '<button class="wishlist-button" onclick="addToWishlist(' . $book['id'] . ')">♡ Wishlist</button>';
-            }
-            echo '</div>';
-        }
-
         // Fetch best sellers
         $sqlBestSellers = "
             SELECT books.id, books.title, books.description, books.price, books.image_url, books.date_published, books.date_added, COUNT(purchased_books.book_id) as purchase_count 
@@ -260,7 +261,7 @@ session_start();
             echo '<h2>Best Sellers</h2>';
             echo '<div class="product-catalog">';
             while($row = $resultBestSellers->fetch_assoc()) {
-                displayBook($row);
+                displayBook($row, $conn, isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null);
             }
             echo '</div>';
             echo '</div>';
@@ -270,7 +271,7 @@ session_start();
         $sqlGenres = "
             SELECT genres.id, genres.name 
             FROM genres 
-             JOIN book_genres ON genres.id = book_genres.genre_id 
+            JOIN book_genres ON genres.id = book_genres.genre_id 
             GROUP BY genres.id 
             HAVING COUNT(book_genres.book_id) > 0 
             ORDER BY RAND() 
@@ -300,7 +301,7 @@ session_start();
                 echo "<h2>$genreName Books</h2>";
                 echo '<div class="product-catalog">';
                 while($row = $resultGenreBooks->fetch_assoc()) {
-                    displayBook($row);
+                    displayBook($row, $conn, isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null);
                 }
                 echo '</div>';
                 echo '</div>';
@@ -316,7 +317,7 @@ session_start();
             echo '<h2>All Books</h2>';
             echo '<div class="product-catalog">';
             while($row = $resultAllBooks->fetch_assoc()) {
-                displayBook($row);
+                displayBook($row, $conn, isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null);
             }
             echo '</div>';
             echo '</div>';
@@ -331,28 +332,7 @@ session_start();
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    const searchInput = document.getElementById('searchInput');
     const productCatalog = document.querySelector('.product-catalog');
-
-    function filterProducts(searchTerm) {
-        const products = Array.from(productCatalog.children);
-
-        products.forEach(product => {
-            const title = product.getAttribute('data-title').toLowerCase();
-            const description = product.getAttribute('data-description').toLowerCase();
-
-            if (title.includes(searchTerm) || description.includes(searchTerm)) {
-                product.style.display = 'block';
-            } else {
-                product.style.display = 'none';
-            }
-        });
-    }
-
-    searchInput.addEventListener('input', function () {
-        const searchTerm = this.value.trim().toLowerCase();
-        filterProducts(searchTerm);
-    });
 
     productCatalog.addEventListener('click', function (event) {
         const productItem = event.target.closest('.product-item');
@@ -400,4 +380,3 @@ function readBook(id) {
 </script>
 </body>
 </html>
-

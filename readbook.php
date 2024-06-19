@@ -73,7 +73,7 @@ if ($resultBook->num_rows > 0) {
         }
         iframe {
             width: 100%;
-            height: 600px;
+            height: 500px; /* Adjust the height to make the window bigger */
             border: none;
             border-radius: 10px;
         }
@@ -84,7 +84,6 @@ if ($resultBook->num_rows > 0) {
 <div class="container">
     <div class="book-title"><?php echo htmlspecialchars($book['title']); ?></div>
     <iframe src="<?php echo htmlspecialchars($book['pdf_url']); ?>" allowfullscreen></iframe>
-
 </div>
 </body>
 </html>
